@@ -10,22 +10,37 @@
   --color-arma-border: #E7E5E4;
   --color-arma-danger: #B45C5C;
   --color-arma-icon: #48433F;
+  --color-arma-active: #75532D;
+  --color-arma-green: #386348;
+  --color-arma-green-soft: #EAF2E8;
+  --color-arma-gold: #89632E;
+  --color-arma-gold-soft: #F7EEDC;
+  --color-arma-red: #A1443E;
+  --color-arma-red-soft: #F8EAE6;
+  --color-arma-neutral: #56514A;
+  --color-arma-neutral-soft: #EFEDE8;
+  --color-arma-photo-top: rgb(250 247 242 / 88%);
+  --color-arma-photo-middle: rgb(250 247 242 / 94%);
+  --color-arma-photo-bottom: rgb(243 236 227 / 98%);
+  --font-arma-body: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-arma-heading: Georgia, "Times New Roman", serif;
+  --radius-arma: 4px;
+  --shadow-arma-card: 0 3px 12px rgb(48 37 22 / 4%);
 }
 
-:root {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: var(--color-arma-text);
-  background: var(--color-arma-background);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
+/* Reusable responsive variant for desktop navigation. */
+@custom-variant desktop {
+  @media (min-width: 1280px) and (hover: hover) and (pointer: fine) {
+    @slot;
+  }
 }
 
-body { margin: 0; min-width: 320px; }
-button, input { font: inherit; }
-button:not(:disabled) { cursor: pointer; }
-
-.login-page {
-  padding-top: max(2rem, env(safe-area-inset-top));
-  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+@layer base {
+  html {
+    @apply font-arma-body text-arma-text bg-arma-background antialiased;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+  }
+  body { @apply m-0 min-w-80; }
+  button:not(:disabled) { @apply cursor-pointer; }
 }

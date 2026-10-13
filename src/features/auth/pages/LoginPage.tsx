@@ -4,7 +4,7 @@ import { LoginForm } from '../components/LoginForm';
 
 export function LoginPage() {
   return (
-    <main className="login-page relative isolate flex min-h-dvh flex-col items-center overflow-x-hidden bg-arma-background px-5" style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+    <main className="pt-[max(2rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] relative isolate flex min-h-dvh flex-col items-center overflow-x-hidden bg-arma-background px-5" style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-arma-background/15" />
       <header className="mt-3 flex flex-col items-center sm:mt-8">
         <img src={logo} alt="ARMA" width={280} height={90} className="h-[90px] w-[280px] object-contain" />
