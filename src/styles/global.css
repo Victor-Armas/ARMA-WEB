@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme {
+  --color-arma-background: #F3ECE3;
+  --color-arma-surface: #FFFFFF;
+  --color-arma-primary: #A8895E;
+  --color-arma-primary-soft: #EEE5D8;
+  --color-arma-text: #171717;
+  --color-arma-muted: #737373;
+  --color-arma-border: #E7E5E4;
+  --color-arma-danger: #B45C5C;
+  --color-arma-icon: #48433F;
+}
+
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--color-arma-text);
+  background: var(--color-arma-background);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body { margin: 0; min-width: 320px; }
+button, input { font: inherit; }
+button:not(:disabled) { cursor: pointer; }
+
+.login-page {
+  padding-top: max(2rem, env(safe-area-inset-top));
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+}

@@ -1,0 +1,13 @@
+{
+  "id": "/",
+  "name": "ARMA · Administración",
+  "short_name": "ARMA",
+  "description": "Administración privada de inventario y ventas de ARMA.",
+  "lang": "es",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F3ECE3",
+  "theme_color": "#F3ECE3",
+  "icons": [{ "src": "/icons/arma.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
