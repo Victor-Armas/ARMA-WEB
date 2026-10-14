@@ -1,10 +1,10 @@
 import { Search } from 'lucide-react';
 import { useState } from 'react';
 
-import { StockProductCard } from '../components/StockProductCard';
-import { useStockProducts } from '../hooks/useStockProducts';
+import { ProductCard } from '../components/ProductCard';
+import { useProducts } from '../hooks/useProducts';
 
-export function StockPage() {
+export function ProductsPage() {
     const [search, setSearch] = useState('');
 
     const {
@@ -14,7 +14,7 @@ export function StockPage() {
         error,
         isFetching,
         refetch,
-    } = useStockProducts();
+    } = useProducts();
 
     const term = search.trim().toLocaleLowerCase('es');
 
@@ -36,15 +36,15 @@ export function StockPage() {
 
     return (
         <section
-            aria-labelledby="stock-title"
+            aria-labelledby="products-title"
             className="px-5 py-6 sm:px-8"
         >
             <header>
                 <h1
-                    id="stock-title"
+                    id="products-title"
                     className="font-arma-heading text-4xl tracking-[-0.035em]"
                 >
-                    Stock
+                    Productos
                 </h1>
 
                 <p className="mt-2 text-sm text-arma-muted">
@@ -53,7 +53,7 @@ export function StockPage() {
             </header>
 
             <div className="mt-6">
-                <label htmlFor="stock-search" className="sr-only">
+                <label htmlFor="products-search" className="sr-only">
                     Buscar por diseño, SKU, talla o color
                 </label>
 
@@ -66,7 +66,7 @@ export function StockPage() {
                     />
 
                     <input
-                        id="stock-search"
+                        id="products-search"
                         type="search"
                         value={search}
                         onChange={(event) => setSearch(event.target.value)}
@@ -84,7 +84,7 @@ export function StockPage() {
                     <p className="text-sm font-medium">
                         {error instanceof Error
                             ? error.message
-                            : 'No pudimos actualizar el inventario.'}
+                            : 'No pudimos actualizar el catálogo.'}
                     </p>
 
                     <button
@@ -102,7 +102,7 @@ export function StockPage() {
                 <div
                     role="status"
                     aria-label="Cargando productos"
-                    className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
+                    className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
                 >
                     {[1, 2, 3, 4, 5].map((item) => (
                         <div
@@ -124,9 +124,9 @@ export function StockPage() {
                         {filteredProducts.length} diseños
                     </p>
 
-                    <div className="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+                    <div className="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                         {filteredProducts.map((product) => (
-                            <StockProductCard
+                            <ProductCard
                                 key={product.id}
                                 product={product}
                             />

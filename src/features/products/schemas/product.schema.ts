@@ -22,7 +22,7 @@ const coverSchema = z.object({
   alt_text: z.string(),
 });
 
-export const stockRowsSchema = z.array(
+export const productRowsSchema = z.array(
   z.object({
     id: z.uuid(),
     name: z.string(),
@@ -33,14 +33,30 @@ export const stockRowsSchema = z.array(
   }),
 );
 
-export type StockVariant = z.infer<typeof variantSchema>;
+export type ProductVariant = z.infer<typeof variantSchema>;
 
-export interface StockProduct {
+export interface Product {
   id: string;
   name: string;
   code: string;
   isDemo: boolean;
   coverUrl: string | null;
   coverAlt: string;
-  variants: StockVariant[];
+  variants: ProductVariant[];
 }
+
+
+export const productDetailRowSchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  code: z.string(),
+  description: z.string().nullable(),
+  is_demo: z.boolean(),
+  product_variants: z.array(variantSchema),
+  product_images: z.array(coverSchema.extend({
+    id: z.uuid(),
+    caption: z.string().nullable(),
+    sort_order: z.number().int().nonnegative(),
+    is_cover: z.boolean(),
+  })),
+});

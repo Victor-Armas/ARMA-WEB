@@ -2,7 +2,8 @@ import { Link, Navigate, Route, Routes } from 'react-router';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { HomePage } from '@/features/home/pages/HomePage';
 import { AppLayout } from '@/layouts/AppLayout';
-import { StockPage } from '@/features/stock/pages/StockPage';
+import { ProductsPage } from '@/features/products/pages/ProductsPage';
+import { ProductDetailPage } from '@/features/products/pages/ProductDetailPage';
 
 interface AppRoutesProps {
   isAuthenticated: boolean;
@@ -19,7 +20,9 @@ export function AppRoutes({ isAuthenticated }: AppRoutesProps) {
         element={isAuthenticated ? <AppLayout /> : <Navigate to="/login" replace />}
       >
         <Route index element={<HomePage />} />
-        <Route path="stock" element={<StockPage />} />
+        <Route path="products" element={<ProductsPage />} />
+        <Route path="products/:productId" element={<ProductDetailPage />} />
+        <Route path="stock" element={<Navigate to="/products" replace />} />
 
 
 

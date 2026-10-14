@@ -36,7 +36,7 @@ export function AppSidebar() {
           <span>Inicio</span>
         </NavLink>
         <NavLink
-          to="/stock"
+          to="/products"
           className={({ isActive }) =>
             `${itemClasses} ${isActive
               ? 'font-semibold text-arma-active desktop:bg-arma-primary-soft'
@@ -45,7 +45,7 @@ export function AppSidebar() {
           }
         >
           <Shirt size={22} strokeWidth={1.7} aria-hidden="true" />
-          <span>Stock</span>
+          <span>Productos</span>
         </NavLink>
 
         {upcomingSections.map(({ label, icon: Icon }) => (
