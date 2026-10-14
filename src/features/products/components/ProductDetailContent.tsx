@@ -1,3 +1,9 @@
+import { useIsMutating } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useSearchParams } from 'react-router';
+import { OrderForm } from '@/features/commerce/components/OrderForm';
+import { useCommercePermissions } from '@/features/commerce/hooks/useCommerce';
+import type { OrderKind } from '@/features/commerce/schemas/commerce.schema';
 import { Bookmark, ShoppingBag } from 'lucide-react';
 import type { ProductDetail } from '../types/product-detail.types';
 import { useProductVariantSelection } from '../hooks/useProductVariantSelection';
@@ -15,6 +21,10 @@ const quantityClasses = {
 };
 
 export function ProductDetailContent({ product }: ProductDetailContentProps) {
+  const [params] = useSearchParams();
+  const [action, setAction] = useState<OrderKind | null>(() => params.get('action') === 'sale' ? 'sale' : params.get('action') === 'reservation' ? 'reservation' : null);
+  const saving = useIsMutating({mutationKey: ['commerce-write']}) > 0;
+  const permissions = useCommercePermissions();
   const { supported, colors, selectedVariant, selectColor, selectVariant } = useProductVariantSelection(product.variants);
   const available = selectedVariant ? getAvailableQuantity(selectedVariant) : 0;
   const physical = selectedVariant?.inventory_balances.reduce((total, balance) => total + balance.physical_quantity, 0) ?? 0;
@@ -30,13 +40,13 @@ export function ProductDetailContent({ product }: ProductDetailContentProps) {
           <>
             <p className="mt-5 text-2xl font-semibold tabular-nums">{new Intl.NumberFormat('es-MX', { style: 'currency', currency: selectedVariant.currency }).format(selectedVariant.sale_price)}</p>
             <p className="mt-1 break-all text-xs text-arma-muted">{selectedVariant.sku}</p>
-            <fieldset className="mt-7">
+            <fieldset disabled={saving} className="mt-7">
               <legend className="text-sm font-semibold">Color</legend>
               <div className="mt-3 flex flex-wrap gap-2">
                 {colors.map(color => <button key={color} type="button" aria-pressed={color === selectedVariant.color} onClick={() => selectColor(color)} className={`min-h-11 rounded-arma border px-4 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-arma-active ${color === selectedVariant.color ? 'border-arma-active bg-arma-primary-soft' : 'border-arma-border bg-arma-surface'}`}>{color}</button>)}
               </div>
             </fieldset>
-            <fieldset className="mt-6">
+            <fieldset disabled={saving} className="mt-6">
               <legend className="text-sm font-semibold">Talla</legend>
               <div className="mt-3 grid grid-cols-3 gap-2">
                 {mainSizes.map(({ size, label }) => {
@@ -61,10 +71,11 @@ export function ProductDetailContent({ product }: ProductDetailContentProps) {
           </div>
         )}
         <div className="mt-7 grid grid-cols-2 gap-3">
-          <button type="button" disabled className="flex min-h-12 items-center justify-center gap-2 rounded-arma bg-arma-primary-soft px-3 text-sm font-semibold text-arma-active opacity-60"><ShoppingBag size={19} aria-hidden="true" />Vender</button>
-          <button type="button" disabled className="flex min-h-12 items-center justify-center gap-2 rounded-arma border border-arma-border bg-arma-surface px-3 text-sm font-semibold text-arma-icon opacity-60"><Bookmark size={19} aria-hidden="true" />Apartar</button>
+          <button type="button" disabled={saving || !selectedVariant || available===0 || !permissions.data?.write} onClick={() => setAction('sale')} className="flex min-h-12 items-center justify-center gap-2 rounded-arma bg-arma-active px-3 text-sm font-semibold text-white hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-arma-active disabled:opacity-50 disabled:cursor-default"><ShoppingBag size={19} aria-hidden="true" />Vender</button>
+          <button type="button" disabled={saving || !selectedVariant || available===0 || !permissions.data?.write} onClick={() => setAction('reservation')} className="flex min-h-12 items-center justify-center gap-2 rounded-arma border border-arma-border bg-arma-surface px-3 text-sm font-semibold text-arma-icon hover:bg-arma-primary-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-arma-active disabled:opacity-50 disabled:cursor-default"><Bookmark size={19} aria-hidden="true" />Apartar</button>
         </div>
-        <p className="mt-2 text-xs leading-5 text-arma-muted">Ventas y apartados estarán disponibles en la siguiente etapa.</p>
+        {permissions.isError ? <div role="alert" className="mt-3 text-xs text-arma-red">No pudimos verificar tus permisos. <button type="button" onClick={()=>void permissions.refetch()} className="min-h-11 underline underline-offset-4">Reintentar</button></div> : permissions.data && !permissions.data.write ? <p className="mt-3 text-xs text-arma-muted">Tu cuenta tiene acceso de consulta; requiere permiso para vender y apartar.</p> : null}
+        {action && selectedVariant && permissions.data?.write ? <OrderForm key={`${selectedVariant.id}-${action}`} kind={action} variant={selectedVariant} productName={product.name} onClose={() => setAction(null)} /> : null}
       </section>
     </div>
   );

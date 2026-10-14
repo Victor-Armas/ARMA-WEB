@@ -3,8 +3,6 @@ import { Link, NavLink } from 'react-router';
 import armaLogo from '@/assets/arma-logo.webp';
 
 const upcomingSections = [
-  { label: 'Apartados', icon: Bookmark },
-  { label: 'Ventas', icon: ShoppingBag },
   { label: 'Clientes', icon: Users },
 ];
 
@@ -47,6 +45,8 @@ export function AppSidebar() {
           <Shirt size={22} strokeWidth={1.7} aria-hidden="true" />
           <span>Productos</span>
         </NavLink>
+
+        {[{to: '/reservations', label: 'Apartados', icon: Bookmark}, {to: '/sales', label: 'Ventas', icon: ShoppingBag}].map(({to,label,icon: Icon}) => <NavLink key={to} to={to} className={({isActive}) => `${itemClasses} ${isActive ? 'font-semibold text-arma-active desktop:bg-arma-primary-soft' : 'text-arma-icon'} desktop:hover:bg-arma-primary-soft`}><Icon size={22} strokeWidth={1.7} aria-hidden="true"/><span>{label}</span></NavLink>)}
 
         {upcomingSections.map(({ label, icon: Icon }) => (
           <button key={label} type="button" disabled title={`${label}: próximamente`} className={itemClasses}>
