@@ -8,8 +8,12 @@ import {
 } from 'lucide-react';
 
 import { SummaryCard } from '@/components/ui/SummaryCard';
+import { useCurrentProfile } from '@/features/profile/hooks/useCurrentProfile';
 
 export function HomePage() {
+    const { fullName } = useCurrentProfile();
+    const greeting = fullName ? `Hola, ${fullName}` : 'Hola';
+
     return (
         <div>
             <div className="mx-auto w-full px-5 py-3 sm:px-8">
@@ -22,7 +26,8 @@ export function HomePage() {
                         id="home-title"
                         className="font-arma-heading font-normal tracking-[-0.035em] mt-2 text-4xl sm:text-3xl"
                     >
-                        Hola, Victor
+
+                        {greeting}
                     </h1>
 
 
