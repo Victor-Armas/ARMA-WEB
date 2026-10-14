@@ -10,11 +10,14 @@ export function useProductDetail(productId: string | undefined) {
     queryKey: ['product-detail', userId, productId],
     enabled: Boolean(userId) && isValidId,
     queryFn: ({ signal }) => {
-      if (!productId || !isValidId) throw new Error('Producto inválido.');
-      return getProductDetail(productId, signal);
+      if (!productId || !isValidId || !userId) throw new Error('Producto inválido.');
+      return getProductDetail(productId, userId, signal);
     },
     staleTime: 60_000,
-    refetchInterval: 50 * 60_000,
+    refetchInterval: query => {
+      const refreshAt = query.state.data?.imageRefreshAt;
+      return refreshAt ? Math.max(1_000, refreshAt - Date.now()) : false;
+    },
     refetchOnWindowFocus: 'always',
   });
   return { ...query, isValidId };

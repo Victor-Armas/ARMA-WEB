@@ -6,9 +6,12 @@ interface ProductImageProps {
   alt: string;
   className: string;
   loading?: 'lazy' | 'eager';
+  fetchPriority?: 'high' | 'low' | 'auto';
+  width?: number;
+  height?: number;
 }
 
-export function ProductImage({ src, alt, className, loading = 'lazy' }: ProductImageProps) {
+export function ProductImage({ src, alt, className, loading = 'lazy', fetchPriority = 'auto', width, height }: ProductImageProps) {
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
   if (!src || failedUrl === src) {
     return (
@@ -17,5 +20,5 @@ export function ProductImage({ src, alt, className, loading = 'lazy' }: ProductI
       </div>
     );
   }
-  return <img src={src} alt={alt} loading={loading} decoding="async" onError={() => setFailedUrl(src)} className={className} />;
+  return <img src={src} alt={alt} loading={loading} fetchPriority={fetchPriority} width={width} height={height} decoding="async" onError={() => setFailedUrl(src)} className={className} />;
 }

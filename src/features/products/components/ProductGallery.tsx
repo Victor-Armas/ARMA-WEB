@@ -1,7 +1,9 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+import { ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
+import { lazy, Suspense, useState } from 'react';
 import type { ProductImageData } from '../types/product-detail.types';
 import { ProductImage } from './ProductImage';
+
+const ImageViewer = lazy(() => import('@/components/ui/ImageViewer'));
 
 interface ProductGalleryProps {
   images: ProductImageData[];
@@ -10,6 +12,7 @@ interface ProductGalleryProps {
 
 export function ProductGallery({ images, name }: ProductGalleryProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [viewerOpen, setViewerOpen] = useState(false);
   const index = Math.max(0, images.findIndex(image => image.id === selectedId));
   const selected = images[index];
 
@@ -20,9 +23,10 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
 
   return (
     <section aria-label={`Fotografías de ${name}`} className="min-w-0">
-      <div className="flex h-[55dvh] min-h-64 items-center justify-center overflow-hidden rounded-arma bg-arma-background lg:h-[64dvh]">
+      <button type="button" disabled={!selected?.url} aria-label={`Ampliar fotografía de ${name}`} onClick={() => setViewerOpen(true)} className="flex h-[55dvh] min-h-64 w-full cursor-zoom-in items-center justify-center overflow-hidden rounded-arma bg-arma-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-arma-active disabled:cursor-default lg:h-[64dvh]">
         <ProductImage src={selected?.url ?? null} alt={selected?.alt ?? name} loading="eager" className="h-full w-full object-contain" />
-      </div>
+      </button>
+      {selected?.url ? <p className="mt-2 flex items-center gap-2 text-xs text-arma-muted"><ZoomIn size={15} aria-hidden="true" />Pulsa la imagen para ampliar</p> : null}
       {selected ? (
         <div className="mt-2 flex items-center justify-between gap-3">
           <p className="min-w-0 text-sm text-arma-muted">{selected.caption ?? 'Fotografía del producto'}</p>
@@ -41,6 +45,11 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
             </button>
           ))}
         </div>
+      ) : null}
+      {viewerOpen ? (
+        <Suspense fallback={<div role="status" className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-4 bg-arma-background"><p className="text-sm text-arma-muted">Abriendo imagen…</p><button type="button" onClick={() => setViewerOpen(false)} className="min-h-11 rounded-arma border border-arma-border px-4 text-sm">Cancelar</button></div>}>
+          <ImageViewer images={images} selectedId={selected?.id ?? null} onSelect={setSelectedId} onClose={() => setViewerOpen(false)} />
+        </Suspense>
       ) : null}
     </section>
   );

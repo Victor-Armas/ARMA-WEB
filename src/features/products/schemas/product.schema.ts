@@ -19,6 +19,7 @@ const variantSchema = z.object({
 const coverSchema = z.object({
   storage_bucket: z.literal("inventory-images"),
   storage_path: z.string(),
+  thumbnail_path: z.string().nullable().optional(),
   alt_text: z.string(),
 });
 
@@ -60,3 +61,18 @@ export const productDetailRowSchema = z.object({
     is_cover: z.boolean(),
   })),
 });
+
+
+export const productsPageSchema = z.object({
+  items: productRowsSchema,
+  total: z.number().int().nonnegative(),
+  page: z.number().int().positive(),
+  page_size: z.literal(12),
+});
+
+export interface ProductsPageData {
+  items: Product[];
+  total: number;
+  page: number;
+  imageRefreshAt: number | null;
+}

@@ -15,4 +15,5 @@ export interface ProductDetail {
   isDemo: boolean;
   images: ProductImageData[];
   variants: ProductVariant[];
+  imageRefreshAt: number | null;
 }
