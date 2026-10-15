@@ -14,9 +14,9 @@ export type OrderFormValues = z.output<typeof orderFormSchema>;
 export type SalesPeriod = 'all' | 'today' | 'week' | 'month';
 export type OrderKind = 'sale' | 'reservation';
 export type PaymentMethod = OrderFormValues['payment_method'];
-export interface CreateOrderInput extends OrderFormValues { request_id: string; kind: OrderKind; variant_id: string; }
+export interface CreateOrderInput extends OrderFormValues { request_id: string; kind: OrderKind; variant_id: string; delivery_id?: string; }
 export interface ResolveReservationInput { id: string; action: 'complete' | 'cancel'; requestId: string; paymentMethod: PaymentMethod; refundConfirmed: boolean; }
-export const commercePermissionsSchema = z.object({read: z.boolean(), write: z.boolean()});
+export const commercePermissionsSchema = z.object({read: z.boolean(), write: z.boolean(), read_all: z.boolean(), manage_all: z.boolean()});
 const orderItemSchema = z.object({
   id: z.uuid(), product_id: z.uuid(), product_variant_id: z.uuid(), product_name: z.string(), sku: z.string(), size: z.string(), color: z.string(),
   cover_path: z.string().nullable().default(null), cover_url: z.string().nullable().default(null),
@@ -26,7 +26,7 @@ export const orderSchema = z.object({
   id: z.uuid(), order_number: z.number().int().positive(), kind: z.enum(['sale', 'reservation']), status: z.enum(['active', 'completed', 'cancelled', 'fulfilled']),
   customer_name: z.string(), customer_phone: z.string(), notes: z.string(), total: z.number().positive(), deposit: z.number().nonnegative(),
   payment_method: z.enum(['cash', 'transfer', 'card']).nullable(), due_date: z.string().nullable(), created_at: z.string(), seller_name: z.string(),
-  delivery_date: z.string().nullable(), delivered_at: z.string().nullable(), source_reservation_id: z.uuid().nullable(),
+  created_by: z.uuid(), delivery_date: z.string().nullable(), delivered_at: z.string().nullable(), source_reservation_id: z.uuid().nullable(),
   refunded_amount: z.number().nonnegative(), source_deposit: z.number().nonnegative(), sale_id: z.uuid().nullable(), items: z.array(orderItemSchema),
 });
 export type CommerceOrder = z.infer<typeof orderSchema>;

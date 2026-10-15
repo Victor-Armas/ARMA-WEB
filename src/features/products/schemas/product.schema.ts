@@ -6,12 +6,24 @@ const balanceSchema = z.object({
   available_quantity: z.number().int().nonnegative(),
 });
 
+export type ProductScope = "mine" | "warehouse" | "catalog";
 const variantSchema = z.object({
+  consignment_lots: z
+    .array(
+      z.object({
+        id: z.uuid(),
+        unit_price: z.number().positive(),
+        available: z.number().int().nonnegative(),
+        created_at: z.string(),
+      }),
+    )
+    .default([]),
   id: z.uuid(),
   sku: z.string(),
   size: z.string(),
   color: z.string(),
   sale_price: z.number().nonnegative(),
+  seller_price: z.number().positive().nullable().default(null),
   currency: z.string().regex(/^[A-Z]{3}$/),
   inventory_balances: z.array(balanceSchema),
 });
@@ -21,6 +33,7 @@ const coverSchema = z.object({
   storage_path: z.string(),
   thumbnail_path: z.string().nullable().optional(),
   alt_text: z.string(),
+  background_color: z.enum(["white", "gray", "black"]).optional(),
 });
 
 export const productRowsSchema = z.array(
@@ -46,7 +59,6 @@ export interface Product {
   variants: ProductVariant[];
 }
 
-
 export const productDetailRowSchema = z.object({
   id: z.uuid(),
   name: z.string(),
@@ -54,14 +66,15 @@ export const productDetailRowSchema = z.object({
   description: z.string().nullable(),
   is_demo: z.boolean(),
   product_variants: z.array(variantSchema),
-  product_images: z.array(coverSchema.extend({
-    id: z.uuid(),
-    caption: z.string().nullable(),
-    sort_order: z.number().int().nonnegative(),
-    is_cover: z.boolean(),
-  })),
+  product_images: z.array(
+    coverSchema.extend({
+      id: z.uuid(),
+      caption: z.string().nullable(),
+      sort_order: z.number().int().nonnegative(),
+      is_cover: z.boolean(),
+    }),
+  ),
 });
-
 
 export const productsPageSchema = z.object({
   items: productRowsSchema,

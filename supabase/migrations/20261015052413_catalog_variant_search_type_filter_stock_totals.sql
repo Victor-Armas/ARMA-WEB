@@ -1,0 +1,26 @@
+drop function public.catalog_admin_page(text,int,text,text);
+drop function arma_private.catalog_admin_page(text,int,text,text);
+CREATE OR REPLACE FUNCTION arma_private.catalog_admin_page(p_kind text, p_page integer DEFAULT 1, p_search text DEFAULT ''::text, p_state text DEFAULT 'active'::text, p_type text DEFAULT ''::text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO ''
+AS $function$declare v_result jsonb;begin
+ if p_kind not in ('product','material') or p_kind is null or not public.has_commerce_permission(case when p_kind='product' then 'products.manage' else 'materials.read' end) then raise exception 'No tienes acceso a esta sección.' using errcode='42501';end if;
+ if p_type is null or p_type not in ('','blank_shirt','dtf_transfer') or (p_kind='product' and p_type<>'') then raise exception 'Tipo inválido.';end if;
+ if p_page is null or p_page not between 1 and 1000000 or p_search is null or length(p_search)>120 or p_state is null or p_state not in ('all','active','hidden') then raise exception 'Filtro inválido.';end if;
+ if p_kind='product' then
+ with matched as materialized(select p.* from public.products p where (p_state='all' or p.is_active=(p_state='active')) and (trim(p_search)='' or strpos(lower(p.name||' '||p.code||' '||coalesce(p.description,'')),lower(trim(p_search)))>0 or exists(select 1 from public.product_variants v where v.product_id=p.id and strpos(lower(v.sku||' '||coalesce(v.color,'')||' '||coalesce(v.size,'')||' '||coalesce(v.description,'')),lower(trim(p_search)))>0))),
+ stats as(select count(*) total,greatest(1,least(p_page,ceil(count(*)/12.0)::int)) page from matched),selected as(select * from matched order by name,id limit 12 offset(select (page-1)*12 from stats))
+ select jsonb_build_object('total',s.total,'page',s.page,'items',coalesce((select jsonb_agg(to_jsonb(p)||jsonb_build_object('kind','product','variants',coalesce((select jsonb_agg(to_jsonb(v)||jsonb_build_object('available',(select coalesce(sum(b.available_quantity),0) from public.inventory_balances b where b.product_variant_id=v.id),'physical',(select coalesce(sum(b.physical_quantity),0) from public.inventory_balances b where b.product_variant_id=v.id),'reserved',(select coalesce(sum(b.reserved_quantity),0) from public.inventory_balances b where b.product_variant_id=v.id)) order by v.sku) from public.product_variants v where v.product_id=p.id),'[]'::jsonb),'images',coalesce((select jsonb_agg(jsonb_build_object('id',i.id,'storage_path',i.storage_path,'alt_text',i.alt_text,'caption',i.caption) order by i.is_cover desc,i.sort_order) from public.product_images i where i.product_id=p.id),'[]'::jsonb)) order by p.name,p.id) from selected p),'[]'::jsonb)) into v_result from stats s;
+ else
+ with matched as materialized(select p.* from public.materials p where (p_type='' or p.material_type=p_type) and (p_state='all' or p.is_active=(p_state='active')) and (trim(p_search)='' or strpos(lower(p.name||' '||p.code||' '||coalesce(p.description,'')),lower(trim(p_search)))>0 or exists(select 1 from public.material_variants v where v.material_id=p.id and strpos(lower(v.sku||' '||coalesce(v.color,'')||' '||coalesce(v.size,'')||' '||coalesce(v.description,'')),lower(trim(p_search)))>0))),
+ stats as(select count(*) total,greatest(1,least(p_page,ceil(count(*)/12.0)::int)) page from matched),selected as(select * from matched order by name,id limit 12 offset(select (page-1)*12 from stats))
+ select jsonb_build_object('total',s.total,'page',s.page,'items',coalesce((select jsonb_agg(to_jsonb(p)||jsonb_build_object('kind','material','variants',coalesce((select jsonb_agg(to_jsonb(v)||jsonb_build_object('available',(select coalesce(sum(b.available_quantity),0) from public.inventory_balances b where b.material_variant_id=v.id),'physical',(select coalesce(sum(b.physical_quantity),0) from public.inventory_balances b where b.material_variant_id=v.id),'reserved',(select coalesce(sum(b.reserved_quantity),0) from public.inventory_balances b where b.material_variant_id=v.id)) order by v.sku) from public.material_variants v where v.material_id=p.id),'[]'::jsonb),'images',coalesce((select jsonb_agg(jsonb_build_object('id',i.id,'storage_path',i.storage_path,'alt_text',i.alt_text,'caption',i.caption) order by i.is_cover desc,i.sort_order) from public.material_images i where i.material_id=p.id),'[]'::jsonb)) order by p.name,p.id) from selected p),'[]'::jsonb)) into v_result from stats s;
+ end if;
+ return v_result;end;$function$
+;
+create function public.catalog_admin_page(p_kind text,p_page int default 1,p_search text default '',p_state text default 'active',p_type text default '') returns jsonb language sql set search_path='' as $$select arma_private.catalog_admin_page(p_kind,p_page,p_search,p_state,p_type);$$;
+revoke all on function public.catalog_admin_page(text,int,text,text,text),arma_private.catalog_admin_page(text,int,text,text,text) from public,anon;
+grant execute on function public.catalog_admin_page(text,int,text,text,text),arma_private.catalog_admin_page(text,int,text,text,text) to authenticated;
+create or replace function public.can_read_inventory() returns boolean language sql stable set search_path='' as $$select public.has_commerce_permission('materials.read');$$;

@@ -1,8 +1,20 @@
-import { useAuthSession } from '@/features/auth/hooks/useAuthSession';
-import { AppRoutes } from './routes/AppRoutes';
+import { Route, Routes, useLocation } from "react-router";
+import { LegalPage } from "@/features/legal/pages/LegalPage";
+import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
+import { AccountGate } from "@/features/auth/components/AccountGate";
+import { AppRoutes } from "./routes/AppRoutes";
 
 export function App() {
   const { session, isLoading } = useAuthSession();
+
+  const location = useLocation();
+  if (location.pathname.startsWith("/legal/")) {
+    return (
+      <Routes>
+        <Route path="/legal/:document" element={<LegalPage />} />
+      </Routes>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -14,5 +26,9 @@ export function App() {
     );
   }
 
-  return <AppRoutes isAuthenticated={Boolean(session)} />;
+  return (
+    <AccountGate>
+      <AppRoutes isAuthenticated={Boolean(session)} />
+    </AccountGate>
+  );
 }

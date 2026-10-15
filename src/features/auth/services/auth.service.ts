@@ -23,3 +23,8 @@ export function subscribeToAuthChanges(
     data.subscription.unsubscribe();
   };
 }
+
+export async function signOutCurrentSession(): Promise<void> {
+  const { error } = await supabase.auth.signOut({ scope: "local" });
+  if (error) throw error;
+}

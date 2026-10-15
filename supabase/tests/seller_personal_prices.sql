@@ -1,0 +1,41 @@
+begin;
+do $$
+declare a uuid:=gen_random_uuid();s uuid:=gen_random_uuid();other uuid:=gen_random_uuid();p uuid:=gen_random_uuid();v uuid:=gen_random_uuid();loc uuid;lot uuid:=gen_random_uuid();lot2 uuid:=gen_random_uuid();sale uuid:=gen_random_uuid();j jsonb;blocked boolean;begin
+ insert into auth.users(id,email) values(a,a::text||'@example.invalid'),(s,s::text||'@example.invalid'),(other,other::text||'@example.invalid');
+ update arma_private.user_security set requires_password_change=false,sessions_valid_from=null where user_id in(a,s,other);
+ insert into public.user_roles(user_id,role_id) select a,id from public.roles where code='admin' on conflict do nothing;
+ insert into public.user_roles(user_id,role_id) select s,id from public.roles where code='seller' on conflict do nothing;
+ insert into public.user_roles(user_id,role_id) select other,id from public.roles where code='seller' on conflict do nothing;
+ insert into public.products(id,code,name,created_by) values(p,p::text,'TEST PERSONAL PRICE',a);
+ insert into public.product_variants(id,product_id,sku,size,color,sale_price) values(v,p,v::text,'M','Negro',300);
+ select id into loc from public.inventory_locations where is_default and is_active;
+ insert into public.inventory_balances(location_id,product_variant_id,physical_quantity,average_unit_cost) values(loc,v,30,100);
+ execute 'set local role authenticated';perform set_config('request.jwt.claims',jsonb_build_object('sub',a,'role','authenticated')::text,true);
+ perform public.seller_write(jsonb_build_object('request_id',lot,'action','deliver','seller_id',s,'variant_id',v,'quantity',5,'unit_price',200));
+ perform public.seller_write(jsonb_build_object('request_id',lot2,'action','deliver','seller_id',s,'variant_id',v,'quantity',5,'unit_price',220));
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',s,'role','authenticated')::text,true);
+ perform public.set_my_variant_price(v,400);perform public.set_my_variant_price(v,400);
+ j:=public.scoped_product_detail(p,'mine');if (j->'product_variants'->0->>'seller_price')::numeric<>400 or (j->'product_variants'->0->>'sale_price')::numeric<>300 then raise exception 'personal price mixed with catalogue';end if;
+ j:=public.scoped_products_page('catalog',1,p::text);if (j->'items'->0->'product_variants'->0->>'seller_price')::numeric<>400 then raise exception 'catalogue personal price missing';end if;
+ blocked:=false;begin perform public.set_my_variant_price(v,219.99);exception when raise_exception then blocked:=true;end;if not blocked then raise exception 'price under agreement accepted';end if;
+ blocked:=false;begin perform public.set_my_variant_price(v,'NaN'::numeric);exception when raise_exception then blocked:=true;end;if not blocked then raise exception 'NaN accepted';end if;
+ blocked:=false;begin perform public.set_my_variant_price(v,400.001);exception when raise_exception then blocked:=true;end;if not blocked then raise exception 'fractional cents accepted';end if;
+ perform public.create_commerce_order(jsonb_build_object('request_id',sale,'kind','sale','variant_id',v,'delivery_id',lot,'quantity',1,'unit_price',400,'payment_method','cash'));
+ perform public.set_my_variant_price(v,450);
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',other,'role','authenticated')::text,true);
+ j:=public.scoped_product_detail(p,'catalog');if j->'product_variants'->0->>'seller_price' is not null then raise exception 'another seller sees price';end if;
+ blocked:=false;begin perform public.set_my_variant_price(v,600);exception when insufficient_privilege then blocked:=true;end;if not blocked then raise exception 'seller without delivery changed price';end if;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',a,'role','authenticated')::text,true);
+ j:=public.scoped_product_detail(p,'warehouse');if j->'product_variants'->0->>'seller_price' is not null or (j->'product_variants'->0->>'sale_price')::numeric<>300 then raise exception 'warehouse price changed';end if;
+ perform public.seller_write(jsonb_build_object('request_id',gen_random_uuid(),'action','deliver','seller_id',s,'variant_id',v,'quantity',2,'unit_price',500));
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',s,'role','authenticated')::text,true);
+ j:=public.scoped_product_detail(p,'mine');if (j->'product_variants'->0->>'seller_price')::numeric<>450 then raise exception 'new delivery silently changed saved price';end if;
+ perform public.set_my_variant_price(v,null);j:=public.scoped_product_detail(p,'mine');if j->'product_variants'->0->>'seller_price' is not null then raise exception 'reset price failed';end if;
+ execute 'reset role';
+ if (select unit_price from public.commerce_order_items where order_id=sale)<>400 then raise exception 'preference changed past sale';end if;
+ if (select unit_price from arma_private.seller_deliveries where id=lot)<>200 or (select unit_price from arma_private.seller_deliveries where id=lot2)<>220 then raise exception 'preference changed agreement';end if;
+ -- Removing the explicit permission is enforced by the server.
+ delete from public.role_permissions rp using public.roles r,public.permissions perm where rp.role_id=r.id and rp.permission_id=perm.id and r.code='seller' and perm.key='products.price_own';
+ execute 'set local role authenticated';blocked:=false;begin perform public.set_my_variant_price(v,700);exception when insufficient_privilege then blocked:=true;end;if not blocked then raise exception 'permission revocation ignored';end if;
+end;$$;
+rollback;

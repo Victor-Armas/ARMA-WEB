@@ -1,0 +1,12 @@
+drop index public.production_created_by_idx;drop index public.production_location_idx;
+create index receipt_variant_idx on arma_private.material_receipts(material_variant_id);
+create index receipt_actor_idx on arma_private.material_receipts(created_by);
+create index valuation_balance_idx on arma_private.cost_valuations(inventory_balance_id);
+create index valuation_actor_idx on arma_private.cost_valuations(created_by);
+create index recipe_actor_idx on arma_private.product_recipes(updated_by);
+create index recipe_material_idx on arma_private.recipe_materials(material_variant_id);
+create index payment_actor_idx on arma_private.commerce_payments(created_by);
+create index return_actor_idx on arma_private.sale_returns(created_by);
+create index production_history_idx on public.production_orders(created_at desc) where planned_quantity is not null;
+create index receipts_history_idx on arma_private.material_receipts(created_at desc);
+do $$declare t text;begin foreach t in array array['material_receipts','cost_valuations','product_recipes','recipe_materials','commerce_payments','sale_returns'] loop execute format('create policy internal_only on arma_private.%I for all to authenticated using(false) with check(false)',t);end loop;end $$;

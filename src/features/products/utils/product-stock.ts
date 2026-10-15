@@ -1,16 +1,16 @@
-import type { ProductVariant } from '../schemas/product.schema';
-import type { ColorStock, StockLevel } from '../types/product-stock.types';
+import type { ProductVariant } from "../schemas/product.schema";
+import type { ColorStock, StockLevel } from "../types/product-stock.types";
 
 export const mainSizes = [
-  { size: 'S', label: 'Chica' },
-  { size: 'M', label: 'Mediana' },
-  { size: 'L', label: 'Grande' },
+  { size: "S", label: "Chica" },
+  { size: "M", label: "Mediana" },
+  { size: "L", label: "Grande" },
 ];
 
 export function getStockLevel(quantity: number): StockLevel {
-  if (quantity <= 3) return 'low';
-  if (quantity <= 5) return 'warning';
-  return 'healthy';
+  if (quantity <= 3) return "low";
+  if (quantity <= 5) return "warning";
+  return "healthy";
 }
 
 export function getStockByColor(variants: ProductVariant[]): ColorStock[] {
@@ -27,11 +27,14 @@ export function getStockByColor(variants: ProductVariant[]): ColorStock[] {
   }
 
   return [...groups.entries()]
-    .sort(([first], [second]) => first.localeCompare(second, 'es'))
+    .sort(([first], [second]) => first.localeCompare(second, "es"))
     .map(([color, quantities]) => {
       return {
         color,
-        quantity: [...quantities.values()].reduce((total, value) => total + value, 0),
+        quantity: [...quantities.values()].reduce(
+          (total, value) => total + value,
+          0,
+        ),
         sizes: mainSizes.map(({ size, label }) => ({
           size,
           label,
@@ -41,11 +44,13 @@ export function getStockByColor(variants: ProductVariant[]): ColorStock[] {
     });
 }
 
-
 export function isSupportedSize(size: string): boolean {
-  return mainSizes.some(main => main.size === size.trim().toUpperCase());
+  return mainSizes.some((main) => main.size === size.trim().toUpperCase());
 }
 
 export function getAvailableQuantity(variant: ProductVariant): number {
-  return variant.inventory_balances.reduce((total, balance) => total + balance.available_quantity, 0);
+  return variant.inventory_balances.reduce(
+    (total, balance) => total + balance.available_quantity,
+    0,
+  );
 }

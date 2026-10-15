@@ -64,7 +64,7 @@ export function LoginForm() {
       </button>
 
       {submitError ? <p role="alert" className="mt-4 text-sm text-arma-danger">{submitError}</p> : null}
-      {isSubmitSuccessful ? <p role="status" className="mt-4 text-sm text-arma-muted">Inicio de sesión correcto.</p> : null}
+      {isSubmitSuccessful && !submitError ? <p role="status" className="mt-4 text-sm text-arma-muted">Inicio de sesión correcto.</p> : null}
     </form>
   );
 }

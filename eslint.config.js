@@ -6,7 +6,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 
 export default defineConfig(
-  { ignores: ['dist/**', 'node_modules/**', '.cache/**'] },
+  { ignores: ['dist/**', 'node_modules/**', '.cache/**', 'supabase/functions/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

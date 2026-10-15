@@ -1,8 +1,10 @@
-import type { ProductVariant } from '../schemas/product.schema';
+import type { ImageBackground } from "@/types/image-background";
+import type { ProductVariant } from "../schemas/product.schema";
 
 export interface ProductImageData {
   id: string;
   url: string | null;
+  background?: ImageBackground;
   alt: string;
   caption: string | null;
 }

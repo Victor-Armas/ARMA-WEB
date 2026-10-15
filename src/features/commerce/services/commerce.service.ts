@@ -19,8 +19,8 @@ export async function getCommercePermissions(signal: AbortSignal) {
   if (error) throw error;
   return commercePermissionsSchema.parse(data);
 }
-export async function getCommerceOrders(kind: OrderKind, page: number, search: string, status: string, delivery: string, period: SalesPeriod, userId: string, signal: AbortSignal) {
-  const {data, error} = await supabase.rpc('commerce_orders_page', {p_kind: kind, p_page: page, p_search: search, p_status: status, p_delivery: delivery, p_period: period}).abortSignal(signal);
+export async function getCommerceOrders(kind: OrderKind, page: number, search: string, status: string, delivery: string, period: SalesPeriod, seller: string, userId: string, signal: AbortSignal) {
+  const {data, error} = await supabase.rpc('commerce_orders_page', {p_kind: kind, p_page: page, p_search: search, p_status: status, p_delivery: delivery, p_period: period, p_seller: seller || null}).abortSignal(signal);
   if (error) throw error;
   const response = ordersPageSchema.parse(data);
   const paths = response.items.flatMap(order => order.items.flatMap(item => item.cover_path ? [item.cover_path] : []));

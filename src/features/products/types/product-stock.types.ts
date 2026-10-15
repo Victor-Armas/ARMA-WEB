@@ -1,4 +1,4 @@
-export type StockLevel = 'low' | 'warning' | 'healthy';
+export type StockLevel = "low" | "warning" | "healthy";
 
 export interface SizeStock {
   size: string;
