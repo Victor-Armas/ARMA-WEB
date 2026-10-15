@@ -1,5 +1,4 @@
-import { CompanyFinances } from "../components/CompanyFinances";
-import { SellerHomeAccount } from "@/features/sellers/components/SellerHomeAccount";
+import { PersonalProgress } from "../components/PersonalProgress";
 import { lazy, Suspense, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router";
@@ -74,10 +73,6 @@ export function HomePage() {
           </Link>
         ) : null}
       </header>
-      {access.can("consignments.read") &&
-      !access.can("inventory.sell_workshop") ? (
-        <SellerHomeAccount />
-      ) : null}
       <DashboardPeriodFilter
         draft={draft}
         range={range}
@@ -93,14 +88,14 @@ export function HomePage() {
           role="status"
           className="mt-6 rounded-arma border border-arma-border bg-arma-surface px-5 py-12 text-sm text-arma-muted"
         >
-          Consultando la actividad de tu negocio…
+          Consultando tu actividad…
         </div>
       ) : query.isError || !data ? (
         <div
           role="alert"
           className="mt-6 rounded-arma border border-arma-border bg-arma-surface p-6"
         >
-          <p>No pudimos cargar el resumen del negocio.</p>
+          <p>No pudimos cargar tu resumen.</p>
           <button
             className={`${secondaryButton} mt-3`}
             onClick={() => void query.refetch()}
@@ -110,27 +105,22 @@ export function HomePage() {
         </div>
       ) : (
         <div aria-busy={query.isFetching}>
-          {access.can("consignments.manage") ? (
-            <p className="mt-5 text-xs leading-5 text-arma-muted">
-              Los cobros de esta sección son pagos de clientes al taller y a
-              vendedores. Las liquidaciones que recibes de vendedores se
-              consultan por separado en{" "}
-              <Link
-                to="/sellers"
-                className="font-medium text-arma-active underline underline-offset-4"
-              >
-                Vendedores
-              </Link>
-              .
+          <header className="mt-7">
+            <h2 className="font-arma-heading text-3xl tracking-tight">
+              {data.mode === "business"
+                ? "Actividad comercial"
+                : "Mi actividad comercial"}
+            </h2>
+            <p className="mt-2 max-w-prose text-sm leading-6 text-arma-neutral">
+              {data.mode === "business"
+                ? "El taller y tus vendedores, en un solo resumen del negocio."
+                : "Tus ventas, tus cobros y lo que ganas con cada entrega."}
             </p>
-          ) : null}
-          {data.company ? <CompanyFinances data={data.company} /> : null}
-          <h2 className="mt-8 font-arma-heading text-2xl">
-            {data.company
-              ? "Actividad comercial · Taller y vendedores"
-              : "Mi actividad comercial"}
-          </h2>
+          </header>
           <DashboardOverview data={data} />
+          {data.mode === "personal" && data.personal ? (
+            <PersonalProgress data={data} />
+          ) : null}
           <div className="mt-6">
             <Suspense
               fallback={
@@ -145,7 +135,7 @@ export function HomePage() {
               <BusinessCharts data={data} />
             </Suspense>
           </div>
-          {data.finance ? (
+          {data.mode === "business" && data.finance ? (
             <>
               <DashboardFinances data={data} />
               <PriceAnalysis prices={data.prices} />

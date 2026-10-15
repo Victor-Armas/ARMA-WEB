@@ -149,3 +149,8 @@ Migraciones `20261015223057_legal_finance_security_review.sql` y `20261015223751
 `company` separa venta atribuible a ARMA, margen conocido y cobros propios de la actividad de reventa del vendedor. No es un cálculo fiscal. Las compras pagadas/a crédito se cuentan al entregar, las consignaciones al vender; no se duplica la reventa. Los retornos y cobros se consideran en su fecha.
 
 Regresión: `supabase/tests/legal_finance_security.sql` (fixtures con rollback). Informe, evidencia y pendientes externos en `docs/audits/2026-10-15-legal-finance-security.md`. No ejecutar nuevamente migraciones ya aplicadas ni borrar historial real para probar.
+
+
+## Inicio de negocio y personal
+
+`20261015230604_separate_business_and_personal_home.sql` agrega al RPC `business_dashboard` un `mode` explícito y métricas `personal` limitadas al usuario autenticado. La ganancia usa el importe de cada entrega y se filtra por fechas; los pagos de apartados no generan ganancia. `company.series` permite integrar las gráficas propias de ARMA en el Inicio global. Pruebas: `supabase/tests/separate_home_dashboards.sql`. Detalles: `docs/home-dashboard.md`.

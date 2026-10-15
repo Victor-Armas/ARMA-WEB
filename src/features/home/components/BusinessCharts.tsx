@@ -74,15 +74,61 @@ export default function BusinessCharts({ data }: { data: Dashboard }) {
       },
     },
   };
+  const personal = data.mode === "personal";
+  const company = data.company;
+  const profitDays = new Map(
+    data.personal?.series.map((day) => [day.date, day.profit]),
+  );
+  const companyDays = new Map(company?.series.map((day) => [day.date, day]));
+  const lines = [
+    {
+      label: personal ? "Tus ventas" : "Ventas a clientes",
+      color: "#315B78",
+      values: data.series.map((day) => day.sales),
+    },
+    ...(personal && data.personal
+      ? [
+          {
+            label:
+              data.personal.unknown_pieces > 0
+                ? "Tu ganancia conocida"
+                : "Tu ganancia",
+            color: "#386348",
+            values: data.series.map((day) => profitDays.get(day.date) ?? null),
+          },
+        ]
+      : []),
+    ...(company
+      ? [
+          {
+            label: "Margen de ARMA",
+            color: "#386348",
+            values: data.series.map(
+              (day) => companyDays.get(day.date)?.margin ?? 0,
+            ),
+          },
+          {
+            label: "Cobros netos de ARMA",
+            color: "#89632E",
+            values: data.series.map(
+              (day) => companyDays.get(day.date)?.receipts ?? 0,
+            ),
+          },
+        ]
+      : []),
+  ];
+  const paymentSource = company?.payments ?? data.payments;
   const payments = ["cash", "transfer", "card"].map((method) =>
-    data.payments.find((p) => p.method === method),
+    paymentSource.find((p) => p.method === method),
   );
   return (
     <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
       <section className="min-w-0 rounded-arma border border-arma-border bg-arma-surface p-4 sm:p-6">
         <div className="flex items-start justify-between gap-3">
           <h2 className="font-arma-heading text-2xl">
-            Ventas y cobros por día
+            {personal
+              ? "Tus ventas y ganancias por día"
+              : "Ventas y resultados del negocio"}
           </h2>
           <ChartNoAxesCombined
             size={22}
@@ -92,38 +138,32 @@ export default function BusinessCharts({ data }: { data: Dashboard }) {
           />
         </div>
         <p className="mt-2 text-xs leading-5 text-arma-muted">
-          Ventas al registrarlas. Cobros netos en la fecha en que entra o se
-          devuelve el dinero.
+          {personal
+            ? "Tu ganancia descuenta el importe pactado de cada entrega y las devoluciones; los pagos de apartados todavía no generan ganancia de venta."
+            : "Ventas a clientes de toda la red, margen propio de ARMA y dinero que recibió el negocio. Las liquidaciones de vendedores se cuentan al recibirse."}
         </p>
         <div className="relative mt-5 h-64 w-full sm:h-80 xl:h-96">
           <Line
             role="img"
-            aria-label="Gráfica de ventas y cobros netos por día. Consulta las cifras en la tabla de datos."
+            aria-label={
+              personal
+                ? "Gráfica de tus ventas y tu ganancia por día. Consulta las cifras en la tabla de datos."
+                : "Gráfica de ventas a clientes, margen de ARMA y cobros de ARMA. Consulta las cifras en la tabla de datos."
+            }
             options={options}
             data={{
               labels: data.series.map((d) =>
                 d.date.slice(5).split("-").reverse().join("/"),
               ),
-              datasets: [
-                {
-                  label: "Ventas",
-                  data: data.series.map((d) => d.sales),
-                  borderColor: "#386348",
-                  backgroundColor: "#386348",
-                  borderWidth: 2.5,
-                  pointRadius: data.series.length > 60 ? 0 : 2,
-                  tension: 0.15,
-                },
-                {
-                  label: "Cobros netos",
-                  data: data.series.map((d) => d.receipts),
-                  borderColor: "#315B78",
-                  backgroundColor: "#315B78",
-                  borderWidth: 2.5,
-                  pointRadius: data.series.length > 60 ? 0 : 2,
-                  tension: 0.15,
-                },
-              ],
+              datasets: lines.map((line) => ({
+                label: line.label,
+                data: line.values,
+                borderColor: line.color,
+                backgroundColor: line.color,
+                borderWidth: 2.5,
+                pointRadius: data.series.length > 60 ? 0 : 2,
+                tension: 0.15,
+              })),
             }}
           />
         </div>
@@ -134,21 +174,31 @@ export default function BusinessCharts({ data }: { data: Dashboard }) {
           <div className="max-h-64 overflow-auto">
             <table className="w-full text-left text-xs tabular-nums">
               <caption className="sr-only">
-                Ventas y cobros diarios en MXN
+                {personal
+                  ? "Tus ventas y ganancias diarias en MXN"
+                  : "Actividad diaria del negocio en MXN"}
               </caption>
               <thead>
                 <tr>
                   <th className="py-2">Fecha</th>
-                  <th className="py-2">Ventas</th>
-                  <th className="py-2">Cobros netos</th>
+                  {lines.map((line) => (
+                    <th key={line.label} className="px-2 py-2">
+                      {line.label}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {data.series.map((d) => (
+                {data.series.map((d, index) => (
                   <tr key={d.date} className="border-t border-arma-border">
                     <td className="py-2">{d.date}</td>
-                    <td>{formatMoney(d.sales)}</td>
-                    <td>{formatMoney(d.receipts)}</td>
+                    {lines.map((line) => (
+                      <td key={line.label} className="px-2 py-2">
+                        {line.values[index] == null
+                          ? "—"
+                          : formatMoney(line.values[index])}
+                      </td>
+                    ))}
                   </tr>
                 ))}
               </tbody>
@@ -159,7 +209,9 @@ export default function BusinessCharts({ data }: { data: Dashboard }) {
       <section className="min-w-0 rounded-arma border border-arma-border bg-arma-surface p-4 sm:p-6">
         <div className="flex items-start justify-between gap-3">
           <h2 className="font-arma-heading text-2xl">
-            Cómo pagan los clientes
+            {personal
+              ? "Cómo te pagan tus clientes"
+              : "Ingresos de ARMA por medio de pago"}
           </h2>
           <Wallet
             size={22}
@@ -169,8 +221,9 @@ export default function BusinessCharts({ data }: { data: Dashboard }) {
           />
         </div>
         <p className="mt-2 text-xs leading-5 text-arma-muted">
-          Cobros a clientes del taller y de vendedores; no son las liquidaciones
-          a ARMA.
+          {personal
+            ? "Tus cobros y reembolsos, incluidos los pagos de apartados. Dinero recibido no equivale a ganancia."
+            : "Pagos al taller y liquidaciones de vendedores. Excluye dinero que los vendedores todavía conservan."}
         </p>
         <div className="relative mt-4 h-48 w-full sm:h-52">
           <Bar
@@ -202,7 +255,7 @@ export default function BusinessCharts({ data }: { data: Dashboard }) {
         </div>
         <dl className="mt-4 divide-y divide-arma-border border-t border-arma-border">
           {(["cash", "transfer", "card"] as const).map((method) => {
-            const payment = data.payments.find((row) => row.method === method);
+            const payment = paymentSource.find((row) => row.method === method);
             const Icon =
               method === "cash"
                 ? Banknote

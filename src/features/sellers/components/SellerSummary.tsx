@@ -1,12 +1,9 @@
-import { Link } from "react-router";
 import { formatMoney } from "@/features/commerce/utils/commerce-format";
 import type { SellerOverview } from "../schemas/seller.schema";
 export function SellerSummary({
   summary: s,
-  compact = false,
 }: {
   summary: SellerOverview["summary"];
-  compact?: boolean;
 }) {
   return (
     <section aria-label="Cuenta de mercancía asignada" className="mt-6">
@@ -41,49 +38,40 @@ export function SellerSummary({
           </p>
         </div>
       </div>
-      {!compact ? (
-        <dl className="mt-4 grid grid-cols-2 gap-4 rounded-arma border border-arma-border bg-arma-surface p-5 lg:grid-cols-4">
-          {[
-            {
-              label: "Ventas netas de devoluciones",
-              value: formatMoney(s.revenue),
-            },
-            {
-              label: "Importe acumulado para ARMA",
-              value: formatMoney(s.owed),
-            },
-            {
-              label: "Entregado a ARMA, menos reintegros",
-              value: formatMoney(s.paid),
-            },
-            { label: "Piezas vendidas netas", value: s.sold },
-            { label: "Piezas en poder del vendedor", value: s.physical },
-            { label: "Apartadas", value: s.reserved },
-            {
-              label: "Disponibles para vender",
-              value: s.physical - s.reserved,
-            },
-            {
-              label: "Pago inicials de apartados activos",
-              value: formatMoney(s.advances),
-            },
-          ].map((row) => (
-            <div key={row.label}>
-              <dt className="text-xs leading-5 text-arma-muted">{row.label}</dt>
-              <dd className="mt-2 break-words text-lg font-semibold tabular-nums">
-                {row.value}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      ) : (
-        <Link
-          to="/sellers"
-          className="mt-3 inline-flex min-h-11 items-center text-sm text-arma-active underline underline-offset-4"
-        >
-          Ver mis entregas y liquidaciones
-        </Link>
-      )}
+      <dl className="mt-4 grid grid-cols-2 gap-4 rounded-arma border border-arma-border bg-arma-surface p-5 lg:grid-cols-4">
+        {[
+          {
+            label: "Ventas netas de devoluciones",
+            value: formatMoney(s.revenue),
+          },
+          {
+            label: "Importe acumulado para ARMA",
+            value: formatMoney(s.owed),
+          },
+          {
+            label: "Entregado a ARMA, menos reintegros",
+            value: formatMoney(s.paid),
+          },
+          { label: "Piezas vendidas netas", value: s.sold },
+          { label: "Piezas en poder del vendedor", value: s.physical },
+          { label: "Apartadas", value: s.reserved },
+          {
+            label: "Disponibles para vender",
+            value: s.physical - s.reserved,
+          },
+          {
+            label: "Pagos iniciales de apartados activos",
+            value: formatMoney(s.advances),
+          },
+        ].map((row) => (
+          <div key={row.label}>
+            <dt className="text-xs leading-5 text-arma-muted">{row.label}</dt>
+            <dd className="mt-2 break-words text-lg font-semibold tabular-nums">
+              {row.value}
+            </dd>
+          </div>
+        ))}
+      </dl>
     </section>
   );
 }

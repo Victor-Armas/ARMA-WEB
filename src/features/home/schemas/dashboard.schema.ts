@@ -1,6 +1,25 @@
 import { z } from "zod";
 const amount = z.number();
 export const dashboardSchema = z.object({
+  mode: z.enum(["business", "personal"]),
+  personal: z
+    .object({
+      profit: amount.nullable(),
+      contract_cost: amount.nullable(),
+      unknown_pieces: amount,
+      previous: z.object({
+        from: z.string(),
+        to: z.string(),
+        sale_count: amount,
+        sales: amount,
+        profit: amount.nullable(),
+        unknown_pieces: amount,
+      }),
+      series: z.array(
+        z.object({ date: z.string(), profit: amount.nullable() }),
+      ),
+    })
+    .nullable(),
   company: z
     .object({
       revenue: amount,
@@ -10,6 +29,14 @@ export const dashboardSchema = z.object({
       received: amount,
       refunded: amount,
       net_receipts: amount,
+      series: z.array(
+        z.object({
+          date: z.string(),
+          revenue: amount,
+          margin: amount,
+          receipts: amount,
+        }),
+      ),
       payments: z.array(
         z.object({
           method: z.enum(["cash", "transfer", "card"]),
@@ -19,8 +46,7 @@ export const dashboardSchema = z.object({
         }),
       ),
     })
-    .nullable()
-    .optional(),
+    .nullable(),
   scope: z.string(),
   finance: z.boolean(),
   sales: amount,

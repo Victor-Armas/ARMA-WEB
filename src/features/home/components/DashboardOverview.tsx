@@ -4,6 +4,8 @@ import {
   Bookmark,
   CircleDollarSign,
   CreditCard,
+  Coins,
+  ChartNoAxesCombined,
   Hammer,
   RotateCcw,
   Shirt,
@@ -21,19 +23,20 @@ const metricTones = {
   blue: "bg-arma-info text-white",
   gold: "bg-arma-warning-soft text-arma-warning",
 };
+type OverviewMetricProps = {
+  label: string;
+  value: string;
+  detail: string;
+  icon: LucideIcon;
+  tone: keyof typeof metricTones;
+};
 function OverviewMetric({
   label,
   value,
   detail,
   icon: Icon,
   tone,
-}: {
-  label: string;
-  value: string;
-  detail: string;
-  icon: LucideIcon;
-  tone: keyof typeof metricTones;
-}) {
+}: OverviewMetricProps) {
   const dark = tone === "green" || tone === "blue";
   return (
     <div
@@ -63,9 +66,92 @@ function OverviewMetric({
 }
 export function DashboardOverview({ data }: { data: Dashboard }) {
   const access = useAppAccess();
+  const business = data.mode === "business";
+  const company = data.company;
+  const personal = data.personal;
+  const metrics: OverviewMetricProps[] = business
+    ? [
+        {
+          label: "Ventas a clientes",
+          value: formatMoney(data.sales),
+          detail: `${data.sale_count} ventas · ${data.pieces} piezas del taller y vendedores, antes de devoluciones`,
+          icon: ShoppingBag,
+          tone: "green",
+        },
+        ...(company
+          ? [
+              {
+                label: "Margen de ARMA",
+                value: formatMoney(company.known_margin),
+                detail: `${company.unknown_cost_pieces > 0 ? "Cálculo parcial. " : ""}Venta propia menos costo registrado. Antes de impuestos y gastos no registrados.`,
+                icon: Coins,
+                tone: "paper",
+              } satisfies OverviewMetricProps,
+            ]
+          : [
+              {
+                label: "Ventas realizadas",
+                value: String(data.sale_count),
+                detail: `${data.pieces} piezas registradas en el período`,
+                icon: ChartNoAxesCombined,
+                tone: "paper",
+              } satisfies OverviewMetricProps,
+            ]),
+        {
+          label: company ? "Cobros netos de ARMA" : "Cobros netos de clientes",
+          value: formatMoney(company?.net_receipts ?? data.net_receipts),
+          detail: company
+            ? `Taller y liquidaciones de vendedores. ${formatMoney(company.refunded)} reembolsados.`
+            : `${formatMoney(data.refunds)} reembolsados · No es utilidad`,
+          icon: Banknote,
+          tone: "blue",
+        },
+        {
+          label: "Apartados por cobrar",
+          value: formatMoney(data.balance),
+          detail: `${data.pending_reservations} por entregar · Saldo actual con clientes de toda la red`,
+          icon: Bookmark,
+          tone: "gold",
+        },
+      ]
+    : [
+        {
+          label: personal?.unknown_pieces
+            ? "Ganancia conocida"
+            : "Ganancia de tus ventas",
+          value: personal?.profit == null ? "—" : formatMoney(personal.profit),
+          detail:
+            "Tus ventas menos devoluciones e importe acordado con ARMA. Antes de gastos personales e impuestos.",
+          icon: Coins,
+          tone: "green",
+        },
+        {
+          label: "Ventas realizadas",
+          value: String(data.sale_count),
+          detail: `${formatMoney(data.sales)} vendidos · ${data.pieces} piezas antes de devoluciones`,
+          icon: ShoppingBag,
+          tone: "paper",
+        },
+        {
+          label: "Cobros netos de clientes",
+          value: formatMoney(data.net_receipts),
+          detail: `${formatMoney(data.receipts)} recibidos · ${formatMoney(data.refunds)} reembolsados. Incluye pagos de apartados.`,
+          icon: CreditCard,
+          tone: "blue",
+        },
+        {
+          label: "Apartados por cobrar",
+          value: formatMoney(data.balance),
+          detail: `${data.pending_reservations} por entregar · Saldo actual de tus clientes`,
+          icon: Bookmark,
+          tone: "gold",
+        },
+      ];
   const stats = [
     {
-      label: "Piezas disponibles",
+      label: business
+        ? "Disponibles en taller"
+        : "Disponibles en tu inventario",
       value: data.available ?? "—",
       icon: Shirt,
       to: access.can("products.read") ? "/products" : null,
@@ -107,40 +193,19 @@ export function DashboardOverview({ data }: { data: Dashboard }) {
   return (
     <>
       <section
-        aria-label="Resumen del negocio"
+        aria-label={
+          business ? "Resumen del negocio" : "Resumen de tu actividad"
+        }
         className="mt-5 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4"
       >
-        <OverviewMetric
-          label="Ventas registradas"
-          value={formatMoney(data.sales)}
-          detail={`${data.sale_count} ventas · ${data.pieces} piezas antes de devoluciones`}
-          icon={ShoppingBag}
-          tone="green"
-        />
-        <OverviewMetric
-          label="Cobros de clientes"
-          value={formatMoney(data.receipts)}
-          detail="Pagos iniciales, abonos y saldos cobrados en el período"
-          icon={Banknote}
-          tone="paper"
-        />
-        <OverviewMetric
-          label="Cobros netos de clientes"
-          value={formatMoney(data.net_receipts)}
-          detail={`${formatMoney(data.refunds)} reembolsados · No es utilidad`}
-          icon={CreditCard}
-          tone="blue"
-        />
-        <OverviewMetric
-          label="Saldo por cobrar"
-          value={formatMoney(data.balance)}
-          detail={`${data.pending_reservations} apartados por entregar · Saldo actual de todos los períodos`}
-          icon={Bookmark}
-          tone="gold"
-        />
+        {metrics.map((metric) => (
+          <OverviewMetric key={metric.label} {...metric} />
+        ))}
       </section>
       <section
-        aria-label="Estado del taller"
+        aria-label={
+          business ? "Estado del negocio" : "Tu inventario y entregas"
+        }
         className="mt-4 grid grid-cols-2 gap-x-5 rounded-arma border border-arma-border bg-arma-surface px-4 sm:px-5 md:grid-cols-3 lg:flex lg:divide-x lg:divide-arma-border lg:gap-0"
       >
         {stats.map(({ label, value, icon: Icon, to, urgent }) => {

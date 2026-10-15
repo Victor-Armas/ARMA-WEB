@@ -19,7 +19,9 @@ export function DashboardActivity({ data }: { data: Dashboard }) {
         <section className="min-w-0 rounded-arma border border-arma-border bg-arma-surface p-4 sm:p-6">
           <div className="flex items-center justify-between gap-3">
             <h2 className="font-arma-heading text-2xl">
-              Productos con más ventas
+              {data.mode === "business"
+                ? "Productos con más ventas"
+                : "Tus productos más vendidos"}
             </h2>
             <ShoppingBag
               size={21}
@@ -90,7 +92,9 @@ export function DashboardActivity({ data }: { data: Dashboard }) {
             )}
           </div>
           <p className="mt-2 text-xs leading-5 text-arma-muted">
-            Existencias actuales de productos e insumos que puedes consultar.
+            {data.mode === "business"
+              ? "Existencias actuales del taller que puedes consultar."
+              : "Existencias de tu mercancía asignada. Consulta las entregas y liquidaciones en Vendedores."}
           </p>
           <div className="mt-4 divide-y divide-arma-border">
             {!data.stock_alerts.length ? (
