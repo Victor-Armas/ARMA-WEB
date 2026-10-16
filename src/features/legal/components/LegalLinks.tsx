@@ -1,5 +1,9 @@
 import { Link } from "react-router";
-export function LegalLinks() {
+export function LegalLinks({
+  publicCatalog = false,
+}: {
+  publicCatalog?: boolean;
+}) {
   return (
     <nav
       aria-label="Información legal"
@@ -13,7 +17,7 @@ export function LegalLinks() {
       ].map(([key, label]) => (
         <Link
           key={key}
-          to={`/legal/${key}`}
+          to={`/legal/${key}${publicCatalog ? "?volver=coleccion" : ""}`}
           className="inline-flex min-h-11 items-center underline underline-offset-4 hover:text-arma-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-arma-active"
         >
           {label}

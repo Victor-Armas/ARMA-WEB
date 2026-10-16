@@ -4,6 +4,14 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/coleccion",
+      "destination": "/catalogo-publico.html"
+    },
+    {
+      "source": "/coleccion/:path*",
+      "destination": "/catalogo-publico.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

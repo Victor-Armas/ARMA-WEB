@@ -10,6 +10,7 @@ import {
 } from "../schemas/access.schema";
 import { useSetRolePermissions } from "../hooks/useTeam";
 const moduleLabels: Record<string, string> = {
+  collection: "Colección pública",
   products: "Productos",
   sales: "Ventas",
   reservations: "Apartados",

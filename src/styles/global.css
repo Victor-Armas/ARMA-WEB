@@ -1,34 +1,68 @@
 @import "tailwindcss";
 
 @theme {
-  --color-arma-background: #F3ECE3;
-  --color-arma-surface: #FFFFFF;
-  --color-arma-primary: #A8895E;
-  --color-arma-primary-soft: #EEE5D8;
+  --color-arma-electric: #2447f5;
+  --color-arma-acid: #d7fc51;
+  --color-arma-coral: #ff754a;
+  --color-arma-ink: #141414;
+  --color-arma-paper: #f6f6f1;
+  --animate-arma-ticker: arma-ticker 32s linear infinite;
+  @keyframes arma-ticker {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  --color-arma-background: #f3ece3;
+  --color-arma-surface: #ffffff;
+  --color-arma-primary: #a8895e;
+  --color-arma-primary-soft: #eee5d8;
   --color-arma-text: #171717;
   --color-arma-muted: #737373;
-  --color-arma-border: #E7E5E4;
-  --color-arma-danger: #B45C5C;
-  --color-arma-icon: #48433F;
-  --color-arma-active: #75532D;
+  --color-arma-border: #e7e5e4;
+  --color-arma-danger: #b45c5c;
+  --color-arma-icon: #48433f;
+  --color-arma-active: #75532d;
   --color-arma-green: #386348;
-  --color-arma-green-soft: #EAF2E8;
-  --color-arma-gold: #89632E;
+  --color-arma-green-soft: #eaf2e8;
+  --color-arma-gold: #89632e;
   --color-arma-warning: #855900;
-  --color-arma-warning-soft: #FFF2C5;
-  --color-arma-gold-soft: #F7EEDC;
-  --color-arma-red: #A1443E;
-  --color-arma-red-soft: #F8EAE6;
-  --color-arma-neutral: #56514A;
-  --color-arma-neutral-soft: #EFEDE8;
-  --color-arma-info: #315B78;
-  --color-arma-info-soft: #EAF1F7;
+  --color-arma-warning-soft: #fff2c5;
+  --color-arma-gold-soft: #f7eedc;
+  --color-arma-red: #a1443e;
+  --color-arma-red-soft: #f8eae6;
+  --color-arma-neutral: #56514a;
+  --color-arma-neutral-soft: #efede8;
+  --color-arma-info: #315b78;
+  --color-arma-info-soft: #eaf1f7;
   --color-arma-photo-top: rgb(250 247 242 / 88%);
   --color-arma-photo-middle: rgb(250 247 242 / 94%);
   --color-arma-photo-bottom: rgb(243 236 227 / 98%);
   --font-arma-body: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-arma-heading: Georgia, "Times New Roman", serif;
   --radius-arma: 4px;
+  --font-arma-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --ease-arma-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --animate-arma-loading: arma-loading 1.4s ease-in-out infinite;
+  --animate-arma-loading-line: arma-loading-line 1.4s linear infinite;
+  @keyframes arma-loading {
+    0%,
+    100% {
+      opacity: 0.55;
+      transform: translateY(3px);
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(-3px);
+    }
+  }
+  @keyframes arma-loading-line {
+    0% {
+      transform: translateX(-100%) scaleX(0.45);
+    }
+    100% {
+      transform: translateX(100%) scaleX(0.45);
+    }
+  }
   --shadow-arma-card: 0 3px 12px rgb(48 37 22 / 4%);
 }
 
@@ -45,6 +79,10 @@
     font-synthesis: none;
     text-rendering: optimizeLegibility;
   }
-  body { @apply m-0 min-w-80; }
-  button:not(:disabled) { @apply cursor-pointer; }
+  body {
+    @apply m-0 min-w-80;
+  }
+  button:not(:disabled) {
+    @apply cursor-pointer;
+  }
 }

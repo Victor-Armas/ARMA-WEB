@@ -11,10 +11,12 @@ import {
   Ellipsis,
   Hammer,
   BookOpen,
+  PanelsTopLeft,
 } from "lucide-react";
 import { Link, NavLink, useLocation } from "react-router";
 import armaLogo from "@/assets/arma-logo.webp";
 import { useAppAccess } from "@/features/access/hooks/useAppAccess";
+import { canManageCollection } from "@/features/collection-management/schemas/collection.schema";
 const items = [
   { to: "/", label: "Inicio", icon: House, permission: null },
   {
@@ -65,6 +67,12 @@ const items = [
     icon: Users,
     permission: "consignments.read",
   },
+  {
+    to: "/collection-management",
+    label: "Colección pública",
+    icon: PanelsTopLeft,
+    permission: "collection.manage",
+  },
   { to: "/team", label: "Equipo", icon: Users, permission: "team.read" },
 ];
 const itemClasses =
@@ -75,10 +83,14 @@ export function AppSidebar() {
   const popover = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const visible = items.filter(
-    (item) => item.permission === null || access.can(item.permission),
+    (item) =>
+      (item.to !== "/collection-management" ||
+        canManageCollection(access.data)) &&
+      (item.permission === null || access.can(item.permission)),
   );
   const extra = visible.filter((item) =>
     [
+      "/collection-management",
       "/materials",
       "/production",
       "/recipes",

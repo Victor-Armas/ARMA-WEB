@@ -12,6 +12,7 @@ interface ProductImageProps {
   className: string;
   loading?: "lazy" | "eager";
   fetchPriority?: "high" | "low" | "auto";
+  draggable?: boolean;
   width?: number;
   height?: number;
 }
@@ -25,6 +26,7 @@ export function ProductImage({
   fetchPriority = "auto",
   width,
   height,
+  draggable,
 }: ProductImageProps) {
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
   if (!src || failedUrl === src) {
@@ -46,6 +48,7 @@ export function ProductImage({
       fetchPriority={fetchPriority}
       width={width}
       height={height}
+      draggable={draggable}
       decoding="async"
       onError={() => setFailedUrl(src)}
       className={`${className} ${background ? imageBackgroundClasses[background] : ""}`}

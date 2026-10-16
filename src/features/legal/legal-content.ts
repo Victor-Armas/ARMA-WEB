@@ -62,13 +62,13 @@ export const legalDocuments = {
     ],
   },
   terminos: {
-    title: "Términos de uso interno",
+    title: "Términos de uso",
     intro: "Reglas para utilizar la herramienta privada de ARMA.",
     sections: [
       {
         title: "Alcance",
         paragraphs: [
-          "Esta aplicación es una herramienta de gestión para personal y vendedores autorizados. El catálogo mostrado por el personal no constituye una tienda pública con pago en línea. Estos términos regulan el uso del sistema; los acuerdos comerciales concretos y los derechos obligatorios de las personas conservan su alcance.",
+          "Esta aplicación es una herramienta de gestión para personal y vendedores autorizados. La sección pública permite consultar productos, fotografías, variantes y precios sin crear una cuenta; no incluye carrito ni pagos en línea. La gestión de inventario, ventas y personal está reservada a cuentas autorizadas. Estos términos regulan el uso del sistema; los acuerdos comerciales concretos y los derechos obligatorios de las personas conservan su alcance.",
         ],
       },
       {
@@ -119,13 +119,14 @@ export const legalDocuments = {
       {
         title: "Sesión y nombre",
         paragraphs: [
-          "Supabase conserva la sesión de acceso en localStorage con una clave que comienza por «sb-» y termina en «-auth-token». Permite mantener la sesión y renovarla. Se elimina al cerrar sesión o borrar los datos del sitio; no confíes en cerrar la pestaña para salir.",
+          "En el acceso del personal, Supabase conserva la sesión de acceso en localStorage con una clave que comienza por «sb-» y termina en «-auth-token». Permite mantener la sesión y renovarla. Se elimina al cerrar sesión o borrar los datos del sitio; no confíes en cerrar la pestaña para salir.",
           "«arma-profile-display» guarda en localStorage el identificador y nombre del usuario para evitar parpadeos al recargar. Se limpia al cerrar sesión. Es una copia de presentación y no concede permisos de acceso.",
         ],
       },
       {
         title: "Imágenes y caché",
         paragraphs: [
+          "El catálogo público no requiere iniciar sesión ni conserva credenciales de acceso del visitante. Mantiene consultas y enlaces temporales a imágenes en memoria mientras está abierto. El navegador puede guardar fotografías y archivos estáticos en su caché habitual.",
           "«arma-product-image-links-v1» conserva enlaces temporales a fotografías en sessionStorage para reducir consultas. La caché corresponde al usuario, se limpia al salir y sus enlaces tienen una vigencia aproximada de una hora. Las consultas también se mantienen temporalmente en memoria y el navegador puede almacenar archivos estáticos de la aplicación.",
         ],
       },

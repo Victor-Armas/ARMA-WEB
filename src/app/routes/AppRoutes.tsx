@@ -1,3 +1,4 @@
+import { CollectionManagementPage } from "@/features/collection-management/pages/CollectionManagementPage";
 import { SellersPage } from "@/features/sellers/pages/SellersPage";
 import { RecipesPage } from "@/features/operations/pages/RecipesPage";
 import { ProductionPage } from "@/features/operations/pages/ProductionPage";
@@ -32,6 +33,10 @@ export function AppRoutes({ isAuthenticated }: AppRoutesProps) {
         }
       >
         <Route index element={<HomePage />} />
+        <Route
+          path="collection-management"
+          element={<CollectionManagementPage />}
+        />
         <Route
           path="sellers"
           element={

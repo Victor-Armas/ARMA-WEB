@@ -1,3 +1,4 @@
+import { optimizeCatalogPhoto } from "./optimize-photo.service";
 import { z } from "zod";
 import { supabase } from "@/lib/supabase";
 import {
@@ -92,15 +93,22 @@ export async function uploadCatalogPhoto(input: {
     "image/jpeg": "jpg",
     "image/webp": "webp",
   };
-  const extension = extensions[input.file.type];
+  if (
+    !extensions[input.file.type] ||
+    input.file.size === 0 ||
+    input.file.size > 5 * 1024 * 1024
+  )
+    throw new Error("Elige una imagen PNG, JPG o WebP de hasta 5 MB.");
+  const file = await optimizeCatalogPhoto(input.file);
+  const extension = extensions[file.type];
   if (!extension || input.file.size === 0 || input.file.size > 5 * 1024 * 1024)
     throw new Error("Elige una imagen PNG, JPG o WebP de hasta 5 MB.");
   const path = `${input.kind === "product" ? "products" : "materials"}/${input.id}/${crypto.randomUUID()}.${extension}`;
   const { error } = await supabase.storage
     .from("inventory-images")
-    .upload(path, input.file, {
+    .upload(path, file, {
       upsert: false,
-      contentType: input.file.type,
+      contentType: file.type,
       cacheControl: "3600",
     });
   if (error) throw error;

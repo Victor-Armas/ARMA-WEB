@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useParams, useSearchParams } from "react-router";
 import { ArrowLeft, FileText, Mail } from "lucide-react";
 import { legalDocuments, legalResponsible } from "../legal-content";
 import { LegalLinks } from "../components/LegalLinks";
@@ -7,6 +7,8 @@ function isDocumentKey(value: string): value is keyof typeof legalDocuments {
   return Object.hasOwn(legalDocuments, value);
 }
 export function LegalPage() {
+  const [searchParams] = useSearchParams();
+  const publicCatalog = searchParams.get("volver") === "coleccion";
   const { document = "privacidad" } = useParams();
   const content = isDocumentKey(document) ? legalDocuments[document] : null;
   useEffect(() => {
@@ -21,11 +23,11 @@ export function LegalPage() {
     <main className="min-h-dvh bg-arma-background px-5 py-8 sm:px-8 sm:py-12">
       <div className="mx-auto max-w-5xl">
         <Link
-          to="/"
+          to={publicCatalog ? "/coleccion" : "/"}
           className="inline-flex min-h-11 items-center gap-2 text-sm text-arma-active underline underline-offset-4"
         >
           <ArrowLeft size={17} aria-hidden="true" />
-          Volver a ARMA
+          {publicCatalog ? "Volver al catálogo" : "Volver a ARMA"}
         </Link>
         <header className="mt-7 border-b border-arma-border pb-7">
           <p className="flex items-center gap-2 text-xs font-semibold tracking-widest text-arma-active">
@@ -89,7 +91,7 @@ export function LegalPage() {
           </aside>
         </div>
         <footer className="mt-10 border-t border-arma-border pt-5">
-          <LegalLinks />
+          <LegalLinks publicCatalog={publicCatalog} />
         </footer>
       </div>
     </main>
