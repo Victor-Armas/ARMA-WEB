@@ -1,3 +1,4 @@
+import { CustomerWhatsAppLink } from "./CustomerWhatsAppLink";
 import { ProductImage } from "@/features/products/components/ProductImage";
 import type { CommerceOrder } from "../schemas/commerce.schema";
 import {
@@ -49,12 +50,7 @@ export function ReservationListCard({
         </span>
       </div>
       {order.customer_phone ? (
-        <a
-          href={`tel:${order.customer_phone.replace(/[^+0-9]/g, "")}`}
-          className="mt-1 inline-block min-h-8 break-all text-sm text-arma-active underline underline-offset-4"
-        >
-          {order.customer_phone}
-        </a>
+        <CustomerWhatsAppLink phone={order.customer_phone} />
       ) : null}
       <ul className="mt-3 space-y-3">
         {order.items.map((item) => (

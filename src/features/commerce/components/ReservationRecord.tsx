@@ -1,3 +1,4 @@
+import { CustomerWhatsAppLink } from "./CustomerWhatsAppLink";
 import { CommerceHistory } from "./CommerceHistory";
 import { useAppAccess } from "@/features/access/hooks/useAppAccess";
 import { Link } from "react-router";
@@ -72,12 +73,7 @@ export function ReservationRecord({
         {order.customer_name}
       </p>
       {order.customer_phone ? (
-        <a
-          href={`tel:${order.customer_phone.replace(/[^+0-9]/g, "")}`}
-          className="mt-1 inline-block text-sm text-arma-active underline underline-offset-4"
-        >
-          {order.customer_phone}
-        </a>
+        <CustomerWhatsAppLink phone={order.customer_phone} />
       ) : null}
       <div className="mt-2">
         <OrderLineItems items={order.items} />

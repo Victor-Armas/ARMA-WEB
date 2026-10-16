@@ -1,3 +1,4 @@
+import { CustomerWhatsAppLink } from "./CustomerWhatsAppLink";
 import { CommerceHistory } from "./CommerceHistory";
 import type { CommerceOrder } from "../schemas/commerce.schema";
 import { OrderLineItems } from "./OrderLineItems";
@@ -41,12 +42,7 @@ export function SaleRecord({ order }: { order: CommerceOrder }) {
             </dd>
             {order.customer_phone ? (
               <dd className="mt-1">
-                <a
-                  href={`tel:${order.customer_phone.replace(/[^+0-9]/g, "")}`}
-                  className="text-sm text-arma-active underline underline-offset-4"
-                >
-                  {order.customer_phone}
-                </a>
+                <CustomerWhatsAppLink phone={order.customer_phone} />
               </dd>
             ) : null}
           </div>
