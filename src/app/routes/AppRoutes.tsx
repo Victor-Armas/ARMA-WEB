@@ -25,14 +25,16 @@ export function AppRoutes({ isAuthenticated }: AppRoutesProps) {
     <Routes>
       <Route
         path="/login"
-        element={isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />}
+        element={
+          isAuthenticated ? <Navigate to="/inicio" replace /> : <LoginPage />
+        }
       />
       <Route
         element={
           isAuthenticated ? <AppLayout /> : <Navigate to="/login" replace />
         }
       >
-        <Route index element={<HomePage />} />
+        <Route path="inicio" element={<HomePage />} />
         <Route
           path="collection-management"
           element={<CollectionManagementPage />}
@@ -135,7 +137,7 @@ export function AppRoutes({ isAuthenticated }: AppRoutesProps) {
                 Página no encontrada
               </h1>
               <Link
-                to="/"
+                to="/inicio"
                 className="mt-5 inline-block underline underline-offset-4"
               >
                 Volver al Inicio

@@ -1,6 +1,6 @@
 import { CollectionLoader } from "@/features/storefront/components/CollectionLoader";
 import { lazy, Suspense } from "react";
-import { Route, Routes, useLocation } from "react-router";
+import { Navigate, Route, Routes, useLocation } from "react-router";
 import { LegalPage } from "@/features/legal/pages/LegalPage";
 const PrivateApp = lazy(() => import("./PrivateApp"));
 const StorefrontRoutes = lazy(
@@ -9,6 +9,7 @@ const StorefrontRoutes = lazy(
 
 export function App() {
   const { pathname } = useLocation();
+  if (pathname === "/") return <Navigate to="/coleccion" replace />;
   if (pathname.startsWith("/legal/"))
     return (
       <Routes>

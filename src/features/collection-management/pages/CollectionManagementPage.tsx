@@ -62,7 +62,7 @@ export function CollectionManagementPage() {
         <p className="mt-3">
           Solo propietario y administrador pueden gestionar la colección.
         </p>
-        <Link to="/" className="mt-4 inline-block underline">
+        <Link to="/inicio" className="mt-4 inline-block underline">
           Volver al inicio
         </Link>
       </section>

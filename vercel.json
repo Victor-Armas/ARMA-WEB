@@ -46,5 +46,12 @@
         }
       ]
     }
+  ],
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/coleccion",
+      "permanent": false
+    }
   ]
 }

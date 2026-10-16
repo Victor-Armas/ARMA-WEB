@@ -81,7 +81,10 @@ export function SalesSummary({ summary }: { summary: SalesSummaryData }) {
         </dl>
         <p className="mt-4 text-xs leading-5">
           Importes anteriores a devoluciones.{" "}
-          <Link to="/" className="font-semibold underline underline-offset-4">
+          <Link
+            to="/inicio"
+            className="font-semibold underline underline-offset-4"
+          >
             Consulta cobros y reembolsos netos en Inicio.
           </Link>
         </p>

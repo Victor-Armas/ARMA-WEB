@@ -18,7 +18,7 @@ import armaLogo from "@/assets/arma-logo.webp";
 import { useAppAccess } from "@/features/access/hooks/useAppAccess";
 import { canManageCollection } from "@/features/collection-management/schemas/collection.schema";
 const items = [
-  { to: "/", label: "Inicio", icon: House, permission: null },
+  { to: "/inicio", label: "Inicio", icon: House, permission: null },
   {
     to: "/products",
     label: "Productos",
@@ -108,7 +108,7 @@ export function AppSidebar() {
     <aside className="fixed inset-x-0 bottom-0 z-20 border-t border-arma-border bg-arma-surface px-1 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] desktop:sticky desktop:inset-auto desktop:top-0 desktop:col-start-1 desktop:row-span-2 desktop:row-start-1 desktop:h-dvh desktop:overflow-y-auto desktop:border-t-0 desktop:border-r desktop:px-4 desktop:pt-0 desktop:pb-6">
       <div className="hidden min-h-15 items-center justify-center px-3 py-4 desktop:flex">
         <Link
-          to="/"
+          to="/inicio"
           aria-label="ARMA — Inicio"
           className="inline-flex rounded-arma outline-offset-4 focus-visible:outline-2 focus-visible:outline-arma-active"
         >
@@ -125,7 +125,7 @@ export function AppSidebar() {
             <NavLink
               key={to}
               to={to}
-              end={to === "/"}
+              end={to === "/inicio"}
               className={({ isActive }) =>
                 `${itemClasses} ${secondary ? "hidden desktop:flex" : "flex"} ${isActive ? "font-semibold text-arma-active desktop:bg-arma-primary-soft" : "text-arma-icon"} desktop:hover:bg-arma-primary-soft`
               }

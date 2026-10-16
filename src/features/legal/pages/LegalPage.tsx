@@ -23,7 +23,7 @@ export function LegalPage() {
     <main className="min-h-dvh bg-arma-background px-5 py-8 sm:px-8 sm:py-12">
       <div className="mx-auto max-w-5xl">
         <Link
-          to={publicCatalog ? "/coleccion" : "/"}
+          to={publicCatalog ? "/coleccion" : "/inicio"}
           className="inline-flex min-h-11 items-center gap-2 text-sm text-arma-active underline underline-offset-4"
         >
           <ArrowLeft size={17} aria-hidden="true" />

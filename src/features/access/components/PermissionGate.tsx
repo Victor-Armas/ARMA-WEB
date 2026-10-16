@@ -37,7 +37,7 @@ export function PermissionGate({
           Tu cuenta no tiene permiso para consultar esta sección.
         </p>
         <Link
-          to="/"
+          to="/inicio"
           className="mt-4 inline-block text-arma-active underline underline-offset-4"
         >
           Volver al inicio

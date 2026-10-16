@@ -63,3 +63,8 @@ La portada presenta fotografías en capas, selector de cuatro modelos y desplaza
 No se añadieron dependencias para el rediseño: se reutiliza Motion. Las fotografías siguen siendo las WebP optimizadas, con precarga real y pantalla de carga; no se descargan fotografías comerciales de otras marcas. La identidad de la campaña toma referencias de composición de marcas de streetwear, sin copiar sus imágenes ni sus textos.
 
 Por solicitud del propietario, el pie público ya no muestra enlaces a avisos legales y presenta el texto «Catálogo totalmente informativo. Sin compras ni pagos en línea», junto con la indicación de confirmar precio y disponibilidad. Las rutas legales y sus documentos siguen existiendo y el área interna conserva sus enlaces. Este cambio de presentación no constituye una evaluación legal sobre obligaciones de privacidad.
+
+
+## Entrada al sitio
+
+La ruta raíz `/` redirige a `/coleccion`, tanto en React como en la configuración de Vercel, sin cargar el acceso del personal. `/login` conserva el formulario de sesión y al ingresar redirige a `/inicio`, el dashboard privado. Los enlaces internos de Inicio, logo, acceso restringido y retorno de documentos legales internos apuntan a `/inicio`. Las rutas privadas siguen exigiendo sesión.
