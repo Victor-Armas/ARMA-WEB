@@ -27,7 +27,9 @@ export function ReservationListCard({
         ? "Entregado"
         : order.status === "fulfilled"
           ? "Pagado"
-          : "Pendiente de pago";
+          : order.stock_status === "waiting"
+            ? "Pendiente de existencia"
+            : "Pendiente de pago";
   const badge =
     order.status === "cancelled"
       ? "bg-arma-neutral-soft text-arma-neutral"

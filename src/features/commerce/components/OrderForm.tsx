@@ -23,6 +23,8 @@ interface OrderFormProps {
   onClose: () => void;
   delivery?: { id: string; unit_price: number; available: number };
   onBusyChange?: (value: boolean) => void;
+  stockMode?: "reserved" | "waiting";
+  stockSource?: "warehouse" | "seller";
 }
 export function OrderForm({
   kind,
@@ -31,6 +33,8 @@ export function OrderForm({
   onClose,
   delivery,
   onBusyChange,
+  stockMode = "reserved",
+  stockSource = "warehouse",
 }: OrderFormProps) {
   const access = useAppAccess();
   const { form, values, total, submit, pending, locked } = useOrderForm(
@@ -40,7 +44,11 @@ export function OrderForm({
     delivery?.available ?? getAvailableQuantity(variant),
     onClose,
     delivery,
-    delivery ? (variant.seller_price ?? undefined) : undefined,
+    delivery || stockSource === "seller"
+      ? (variant.seller_price ?? undefined)
+      : undefined,
+    stockMode,
+    stockSource,
   );
   useEffect(() => {
     onBusyChange?.(pending || locked);
@@ -93,7 +101,11 @@ export function OrderForm({
                   aria-invalid={Boolean(errorId)}
                   type="number"
                   min="1"
-                  max={delivery?.available ?? getAvailableQuantity(variant)}
+                  max={
+                    stockMode === "waiting"
+                      ? 10000
+                      : (delivery?.available ?? getAvailableQuantity(variant))
+                  }
                   step="1"
                   className={fieldClass}
                 />
@@ -293,7 +305,9 @@ export function OrderForm({
         <p className="text-xs leading-5 text-arma-muted">
           {kind === "sale"
             ? "Confirma después de recibir el pago. Se descontarán las piezas del stock físico."
-            : "El pago inicial registra dinero recibido. Las piezas se reservan hasta completar o cancelar el apartado."}
+            : stockMode === "waiting"
+              ? "El anticipo registra dinero recibido. Este pedido queda pendiente de existencia y todavía no reserva piezas."
+              : "El pago inicial registra dinero recibido. Las piezas se reservan hasta completar o cancelar el apartado."}
         </p>
         {locked && !pending ? (
           <p className="text-xs text-arma-muted">
@@ -312,7 +326,9 @@ export function OrderForm({
               ? "Guardando…"
               : kind === "sale"
                 ? "Confirmar venta"
-                : "Confirmar apartado"}
+                : stockMode === "waiting"
+                  ? "Guardar pedido pendiente"
+                  : "Confirmar apartado"}
           </button>
           <button
             type="button"

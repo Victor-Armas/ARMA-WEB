@@ -1,3 +1,4 @@
+import { ReservationStockAssignment } from "./ReservationStockAssignment";
 import { CustomerWhatsAppLink } from "./CustomerWhatsAppLink";
 import { CommerceHistory } from "./CommerceHistory";
 import { useAppAccess } from "@/features/access/hooks/useAppAccess";
@@ -63,7 +64,9 @@ export function ReservationRecord({
             ? "Entregado"
             : deliveryLate
               ? "Entrega atrasada"
-              : statusLabels[order.status]}
+              : order.status === "active" && order.stock_status === "waiting"
+                ? "Pendiente de existencia"
+                : statusLabels[order.status]}
         </span>
       </div>
       <p className="mt-2 text-xs text-arma-muted">
@@ -164,8 +167,16 @@ export function ReservationRecord({
       (access.can("sales.complete") || access.can("reservations.cancel")) ? (
         <ReservationAction
           order={order}
-          canComplete={access.can("sales.complete")}
+          canComplete={
+            order.stock_status !== "waiting" && access.can("sales.complete")
+          }
           canCancel={access.can("reservations.cancel")}
+        />
+      ) : null}
+      {order.status === "active" && order.stock_status === "waiting" ? (
+        <ReservationStockAssignment
+          order={order}
+          canAssign={canWrite && access.can("reservations.create")}
         />
       ) : null}
       <CommerceHistory order={order} />

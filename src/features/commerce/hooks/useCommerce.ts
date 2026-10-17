@@ -13,6 +13,7 @@ import {
   setReservationDeliveryDate,
   markReservationDelivered,
 } from "../services/commerce.service";
+import { assignReservationStock } from "../services/reservation-stock.service";
 import type { OrderKind, SalesPeriod } from "../schemas/commerce.schema";
 
 export function useCommercePermissions() {
@@ -89,6 +90,7 @@ export function useCommerceMutations() {
     await Promise.all(
       [
         "seller-overview",
+        "reservation-stock",
         "commerce-orders",
         "products",
         "product-detail",
@@ -126,5 +128,12 @@ export function useCommerceMutations() {
     onError: refresh,
     retry: false,
   });
-  return { create, resolve, schedule, deliver };
+  const assignStock = useMutation({
+    mutationKey: ["commerce-write"],
+    mutationFn: assignReservationStock,
+    onSuccess: refresh,
+    onError: refresh,
+    retry: false,
+  });
+  return { create, resolve, schedule, deliver, assignStock };
 }

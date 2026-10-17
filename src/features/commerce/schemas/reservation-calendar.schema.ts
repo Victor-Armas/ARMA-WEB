@@ -2,6 +2,7 @@ import { z } from "zod";
 export const reservationStatusSchema = z.enum([
   "",
   "pending",
+  "waiting_stock",
   "active",
   "fulfilled",
   "delivered",
@@ -18,6 +19,8 @@ export const reservationCalendarSchema = z.object({
     }),
   ),
   summary: z.object({
+    waiting_orders: z.number().int().nonnegative().default(0),
+    waiting_pieces: z.number().int().nonnegative().default(0),
     pending_orders: z.number().int().nonnegative(),
     pending_pieces: z.number().int().nonnegative(),
     balance: z.number().nonnegative(),

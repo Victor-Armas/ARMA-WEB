@@ -8,6 +8,7 @@ export function ReservationOverview({
   loading: boolean;
 }) {
   const values = [
+    { label: "Pendientes de existencia", value: summary?.waiting_orders },
     { label: "Apartados por entregar", value: summary?.pending_orders },
     { label: "Piezas por entregar", value: summary?.pending_pieces },
     {
@@ -20,7 +21,7 @@ export function ReservationOverview({
     <div>
       <dl
         aria-busy={loading}
-        className="mt-6 grid grid-cols-2 gap-3 xl:grid-cols-4"
+        className="mt-6 grid grid-cols-2 gap-3 xl:grid-cols-5"
       >
         {values.map((item) => (
           <div

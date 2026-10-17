@@ -115,6 +115,14 @@ export function ReservationsPage() {
               Crear apartado
             </Link>
           ) : null}
+          {access.can("reservations.create") && access.can("products.read") ? (
+            <Link
+              to="/products?scope=catalog&action=reservation"
+              className={`${secondaryButton} inline-flex items-center justify-center no-underline`}
+            >
+              Solicitar sin existencia
+            </Link>
+          ) : null}
         </div>
       </header>
       <ReservationOverview
@@ -171,6 +179,7 @@ export function ReservationsPage() {
           >
             <option value="pending">Por entregar</option>
             <option value="">Todos</option>
+            <option value="waiting_stock">Pendientes de existencia</option>
             <option value="active">Pendientes de pago</option>
             <option value="fulfilled">Pagados</option>
             <option value="delivered">Entregados</option>

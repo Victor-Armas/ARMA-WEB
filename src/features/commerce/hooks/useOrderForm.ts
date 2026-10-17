@@ -23,6 +23,8 @@ export function useOrderForm(
   onSuccess: () => void,
   delivery?: { id: string; unit_price: number },
   initialPrice?: number,
+  stockMode: "reserved" | "waiting" = "reserved",
+  stockSource: "warehouse" | "seller" = "warehouse",
 ) {
   const [requestId] = useState(() => crypto.randomUUID());
   const [locked, setLocked] = useState(false);
@@ -54,7 +56,7 @@ export function useOrderForm(
       });
       return;
     }
-    if (values.quantity > available) {
+    if (stockMode !== "waiting" && values.quantity > available) {
       form.setError("quantity", {
         message: `Hay ${available} piezas disponibles.`,
       });
@@ -88,6 +90,9 @@ export function useOrderForm(
         request_id: requestId,
         kind,
         variant_id: variantId,
+        ...(kind === "reservation"
+          ? { stock_mode: stockMode, stock_source: stockSource }
+          : {}),
         ...(delivery ? { delivery_id: delivery.id } : {}),
       });
       notify.success(

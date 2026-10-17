@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useAppAccess } from "@/features/access/hooks/useAppAccess";
+import { getAvailableQuantity } from "@/features/products/utils/product-stock";
 import { Modal } from "@/components/ui/Modal";
 import { ProductImage } from "@/features/products/components/ProductImage";
 import type {
@@ -28,6 +30,20 @@ export function OrderModal({
   onClose: () => void;
 }) {
   const [busy, setBusy] = useState(false);
+  const access = useAppAccess();
+  const source =
+    scope === "mine" ||
+    (scope === "catalog" && !access.can("inventory.sell_workshop"))
+      ? "seller"
+      : "warehouse";
+  const canReserveExisting =
+    scope !== "catalog" &&
+    (scope === "mine"
+      ? variant.consignment_lots.some((l) => l.available > 0)
+      : getAvailableQuantity(variant) > 0);
+  const [stockMode, setStockMode] = useState<"reserved" | "waiting">(() =>
+    kind === "reservation" && !canReserveExisting ? "waiting" : "reserved",
+  );
   const [lotId, setLotId] = useState(variant.consignment_lots[0]?.id ?? "");
   const delivery = variant.consignment_lots.find((lot) => lot.id === lotId);
   return (
@@ -51,13 +67,58 @@ export function OrderModal({
             {variant.color} · {variant.size}
           </p>
           <p className="mt-2 text-xs text-arma-muted">
-            {scope === "mine"
+            {source === "seller"
               ? "Cobro recibido por el vendedor"
-              : "Venta del inventario del taller"}
+              : "Operación del taller"}
           </p>
         </div>
       </div>
-      {scope === "mine" ? (
+      {kind === "reservation" && (
+        <fieldset disabled={busy} className="mb-5">
+          <legend className="mb-3 text-sm font-semibold">
+            Existencia del apartado
+          </legend>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {(
+              [
+                ["reserved", "Reservar existencia disponible"],
+                ["waiting", "Pendiente de existencia"],
+              ] as const
+            ).map(([value, label]) => (
+              <label
+                key={value}
+                className={`flex min-h-12 items-center gap-3 rounded-arma border p-3 text-sm ${stockMode === value ? "border-arma-active bg-arma-primary-soft" : "border-arma-border"}`}
+              >
+                <input
+                  type="radio"
+                  name="reservation-stock-mode"
+                  value={value}
+                  checked={stockMode === value}
+                  disabled={value === "reserved" && !canReserveExisting}
+                  onChange={() => setStockMode(value)}
+                  className="size-4 accent-arma-active"
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
+      {kind === "reservation" && stockMode === "waiting" && (
+        <p
+          role="status"
+          className="mb-5 rounded-arma bg-arma-info-soft p-4 text-sm leading-6 text-arma-info"
+        >
+          Se guardará el pedido y su anticipo, sin descontar ni reservar piezas
+          todavía. Cuando{" "}
+          {source === "seller"
+            ? "ARMA te entregue la mercancía"
+            : "estén listas las playeras"}
+          , asigna la existencia desde el detalle del apartado antes de
+          completar la venta.
+        </p>
+      )}
+      {scope === "mine" && stockMode !== "waiting" ? (
         <div className="mb-5">
           <label
             htmlFor="delivery-lot"
@@ -86,13 +147,15 @@ export function OrderModal({
           </p>
         </div>
       ) : null}
-      {scope !== "mine" || delivery ? (
+      {stockMode === "waiting" || scope !== "mine" || delivery ? (
         <OrderForm
           key={lotId}
           kind={kind}
           variant={variant}
           productName={productName}
-          delivery={delivery}
+          delivery={stockMode === "waiting" ? undefined : delivery}
+          stockMode={stockMode}
+          stockSource={source}
           onBusyChange={setBusy}
           onClose={onClose}
         />

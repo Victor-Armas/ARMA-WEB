@@ -47,7 +47,7 @@ export function ProductDetailContent({
   const permissions = useCommercePermissions();
   const access = useAppAccess();
   const canSale = scope !== "catalog" && access.can("sales.create");
-  const canReserve = scope !== "catalog" && access.can("reservations.create");
+  const canReserve = access.can("reservations.create");
   const { supported, colors, selectedVariant, selectColor, selectVariant } =
     useProductVariantSelection(product.variants);
   const available = selectedVariant ? getAvailableQuantity(selectedVariant) : 0;
@@ -203,6 +203,16 @@ export function ProductDetailContent({
         {scope === "catalog" ? (
           <p className="mt-6 rounded-arma bg-arma-info-soft p-4 text-sm leading-6 text-arma-info">
             Consulta los diseños, colores y tallas de cada producto.
+            {canReserve && selectedVariant ? (
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() => setAction("reservation")}
+                className="mt-3 block min-h-11 rounded-arma bg-arma-active px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"
+              >
+                Solicitar sin existencia
+              </button>
+            ) : null}
           </p>
         ) : (
           <div className="mt-7 grid grid-cols-2 gap-3">
@@ -219,14 +229,12 @@ export function ProductDetailContent({
             </button>
             <button
               type="button"
-              disabled={
-                saving || !selectedVariant || available === 0 || !canReserve
-              }
+              disabled={saving || !selectedVariant || !canReserve}
               onClick={() => setAction("reservation")}
               className="flex min-h-12 items-center justify-center gap-2 rounded-arma border border-arma-border bg-arma-surface px-3 text-sm font-semibold text-arma-icon hover:bg-arma-primary-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-arma-active disabled:opacity-50 disabled:cursor-default"
             >
               <Bookmark size={19} aria-hidden="true" />
-              Apartar
+              {available === 0 ? "Solicitar sin existencia" : "Apartar"}
             </button>
           </div>
         )}

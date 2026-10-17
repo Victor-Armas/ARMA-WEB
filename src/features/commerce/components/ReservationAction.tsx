@@ -84,7 +84,9 @@ export function ReservationAction({
       <p className="text-sm font-semibold">
         {action === "complete"
           ? `Confirma el cobro del saldo: ${formatMoney(order.total - order.deposit)}`
-          : "Las piezas del apartado volverán a estar disponibles."}
+          : order.stock_status === "waiting"
+            ? "Se cancelará el pedido pendiente. No hay piezas reservadas que liberar."
+            : "Las piezas del apartado volverán a estar disponibles."}
       </p>
       {action === "complete" ? (
         <div className="mt-4 max-w-xs">
@@ -127,7 +129,8 @@ export function ReservationAction({
             onChange={(event) => setRefund(event.target.checked)}
             className="mt-1 size-5 accent-arma-active"
           />
-          Ya devolví los abonos de {formatMoney(order.deposit)} por los mismos medios en que se recibieron.
+          Ya devolví los abonos de {formatMoney(order.deposit)} por los mismos
+          medios en que se recibieron.
         </label>
       ) : null}
       <div className="mt-4 flex flex-wrap gap-3">
