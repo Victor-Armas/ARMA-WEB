@@ -10,6 +10,13 @@ import { CatalogImageGate } from "../components/CatalogImageGate";
 
 export function CollectionPage() {
   const query = usePublicCollection();
+  return <CollectionContent query={query} />;
+}
+export function CollectionContent({
+  query,
+}: {
+  query: ReturnType<typeof usePublicCollection>;
+}) {
   return (
     <>
       <title>ARMA · No sigas el molde</title>

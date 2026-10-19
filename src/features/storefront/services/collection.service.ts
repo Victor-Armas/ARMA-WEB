@@ -2,7 +2,7 @@ import { z } from "zod";
 import { publicSupabase } from "@/lib/supabase-public";
 import { storefrontPageSchema } from "../schemas/storefront.schema";
 import { hydrateStorefrontPage } from "./storefront.service";
-const schema = storefrontPageSchema.extend({
+export const publicCollectionSchema = storefrontPageSchema.extend({
   published: z.boolean(),
   featured_ids: z.array(z.uuid()),
   offer_ids: z.array(z.uuid()),
@@ -20,6 +20,6 @@ export async function getPublicCollection(signal: AbortSignal) {
     .rpc("customer_collection")
     .abortSignal(AbortSignal.any([signal, AbortSignal.timeout(15000)]));
   if (error) throw error;
-  const parsed = schema.parse(data);
+  const parsed = publicCollectionSchema.parse(data);
   return { ...parsed, ...(await hydrateStorefrontPage(parsed)) };
 }

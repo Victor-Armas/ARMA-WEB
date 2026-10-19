@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AppearanceEditor } from "../components/AppearanceEditor";
 import { ExternalLink, Plus, RefreshCw, Pencil, Tag } from "lucide-react";
 import { Link } from "react-router";
 import { useAppAccess } from "@/features/access/hooks/useAppAccess";
@@ -33,7 +34,7 @@ export function CollectionManagementPage() {
   const access = useAppAccess();
   const allowed = canManageCollection(access.data);
   const { query, configuration, offer } = useCollectionAdmin(allowed);
-  const [tab, setTab] = useState<"cover" | "offers">("cover");
+  const [tab, setTab] = useState<"cover" | "offers" | "appearance">("cover");
   const [editing, setEditing] = useState<CollectionOffer | null | undefined>(
     undefined,
   );
@@ -95,12 +96,13 @@ export function CollectionManagementPage() {
         <div
           role="tablist"
           aria-label="Administrar colección"
-          className="flex gap-5"
+          className="flex gap-3 sm:gap-5"
         >
           {(
             [
               ["cover", "Portada"],
               ["offers", "Ofertas"],
+              ["appearance", "Apariencia"],
             ] as const
           ).map(([id, label]) => (
             <button
@@ -146,7 +148,9 @@ export function CollectionManagementPage() {
             id={`panel-${tab}`}
             aria-labelledby={`tab-${tab}`}
           >
-            {tab === "cover" ? (
+            {tab === "appearance" ? (
+              <AppearanceEditor enabled={allowed} />
+            ) : tab === "cover" ? (
               <FeaturedEditor
                 key={data.settings.updated_at}
                 data={data}

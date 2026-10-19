@@ -12,7 +12,7 @@ export function CollectionTicker({
   return (
     <section
       aria-label="Explora los modelos"
-      className="relative overflow-hidden bg-arma-ink py-5 text-arma-acid sm:py-7"
+      className="relative overflow-hidden bg-arma-ink py-5 text-[color:var(--collection-accent-on-ink)] sm:py-7"
     >
       <div className="pr-16">
         <div

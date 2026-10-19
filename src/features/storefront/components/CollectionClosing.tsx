@@ -4,7 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 export function CollectionClosing() {
   const reduce = useReducedMotion();
   return (
-    <section className="overflow-hidden bg-arma-coral px-5 py-14 text-arma-ink sm:px-8 sm:py-20 lg:px-12">
+    <section className="overflow-hidden bg-arma-coral px-5 py-14 text-[color:var(--collection-on-coral)] sm:px-8 sm:py-20 lg:px-12">
       <div className="mx-auto max-w-[1440px]">
         <m.h2
           initial={{ transform: reduce ? "none" : "translateY(24px)" }}
@@ -25,7 +25,7 @@ export function CollectionClosing() {
           </p>
           <Link
             to="/coleccion/catalogo"
-            className="group inline-flex min-h-14 items-center justify-between gap-12 rounded-arma bg-arma-ink px-6 py-4 text-sm font-semibold text-white"
+            className="group inline-flex min-h-14 items-center justify-between gap-12 rounded-arma bg-arma-ink px-6 py-4 text-sm font-semibold text-[color:var(--collection-on-ink)]"
           >
             Catálogo completo
             <ArrowUpRight

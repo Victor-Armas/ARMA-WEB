@@ -53,8 +53,13 @@ export function CollectionHero({
     <section
       ref={ref}
       aria-label="Descubre ARMA"
-      className="relative isolate overflow-hidden bg-arma-electric text-white"
+      className="relative isolate overflow-hidden bg-arma-electric text-[color:var(--collection-on-electric)]"
     >
+      <div
+        aria-hidden="true"
+        data-collection-background
+        className="pointer-events-none absolute inset-0 -z-10 bg-center [background-image:var(--collection-background-image)] [background-repeat:var(--collection-background-repeat)] [background-size:var(--collection-background-size)] [opacity:var(--collection-background-opacity)]"
+      />
       <div className="mx-auto grid max-w-[1600px] gap-8 px-5 pb-8 pt-9 sm:px-8 sm:pt-12 lg:min-h-[min(780px,calc(100dvh-80px))] lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-10 lg:px-12 lg:py-12">
         <div className="relative z-10 min-w-0 lg:py-5">
           <m.h1
@@ -68,7 +73,7 @@ export function CollectionHero({
           >
             <span className="block">{settings.headline_1}</span>
             <span className="block">{settings.headline_2}</span>
-            <span className="mt-2 block text-arma-acid">
+            <span className="mt-2 block text-[color:var(--collection-accent-on-electric)]">
               {settings.headline_3}
             </span>
           </m.h1>
@@ -84,12 +89,12 @@ export function CollectionHero({
               ease,
             }}
           >
-            <p className="mt-6 max-w-sm whitespace-pre-line break-words text-sm leading-6 text-white sm:text-base">
+            <p className="mt-6 max-w-sm whitespace-pre-line break-words text-sm leading-6 text-[color:var(--collection-on-electric)] sm:text-base">
               {settings.intro}
             </p>
             <Link
               to="/coleccion/catalogo"
-              className="group mt-6 inline-flex min-h-13 items-center justify-between gap-10 rounded-arma bg-arma-acid px-5 py-4 text-sm font-semibold text-arma-ink transition-transform duration-150 ease-arma-out active:scale-[0.98] motion-reduce:transform-none"
+              className="group mt-6 inline-flex min-h-13 items-center justify-between gap-10 rounded-arma bg-arma-acid px-5 py-4 text-sm font-semibold text-[color:var(--collection-on-acid)] transition-transform duration-150 ease-arma-out active:scale-[0.98] motion-reduce:transform-none"
             >
               Explorar catálogo
               <ArrowUpRight
@@ -137,7 +142,7 @@ export function CollectionHero({
                   disabled={selection.length < 2}
                   onClick={(e) => select(active - 1, e.detail > 0)}
                   aria-label="Modelo anterior"
-                  className="flex size-11 items-center justify-center rounded-arma border border-black/20 hover:bg-arma-acid disabled:opacity-40"
+                  className="flex size-11 items-center justify-center rounded-arma border border-black/20 hover:bg-arma-acid hover:text-[color:var(--collection-on-acid)] disabled:opacity-40"
                 >
                   <ChevronLeft size={21} aria-hidden="true" />
                 </button>
@@ -146,7 +151,7 @@ export function CollectionHero({
                   disabled={selection.length < 2}
                   onClick={(e) => select(active + 1, e.detail > 0)}
                   aria-label="Modelo siguiente"
-                  className="flex size-11 items-center justify-center rounded-arma border border-black/20 hover:bg-arma-acid disabled:opacity-40"
+                  className="flex size-11 items-center justify-center rounded-arma border border-black/20 hover:bg-arma-acid hover:text-[color:var(--collection-on-acid)] disabled:opacity-40"
                 >
                   <ChevronRight size={21} aria-hidden="true" />
                 </button>
@@ -165,7 +170,7 @@ export function CollectionHero({
                 background={next.photos[0]?.background}
                 className="aspect-[4/5] w-full rounded-arma object-cover"
               />
-              <span className="flex items-center justify-between gap-2 px-1 pb-1 pt-2 text-xs font-semibold text-arma-ink">
+              <span className="flex items-center justify-between gap-2 px-1 pb-1 pt-2 text-xs font-semibold text-[color:var(--collection-on-coral)]">
                 {next.name.replace(/^ARMA\s+/i, "")}
                 <ArrowUpRight size={15} aria-hidden="true" />
               </span>
@@ -184,7 +189,7 @@ export function CollectionHero({
               type="button"
               aria-pressed={i === active}
               onClick={(e) => select(i, e.detail > 0)}
-              className={`group flex min-h-19 min-w-0 items-center justify-between gap-3 border-b-2 py-4 text-left transition-colors ${i === active ? "border-arma-acid text-arma-acid" : "border-transparent text-white hover:text-arma-acid"}`}
+              className={`group flex min-h-19 min-w-0 items-center justify-between gap-3 border-b-2 py-4 text-left transition-colors ${i === active ? "border-arma-acid text-[color:var(--collection-accent-on-electric)]" : "border-transparent text-[color:var(--collection-on-electric)] hover:text-[color:var(--collection-accent-on-electric)]"}`}
             >
               <span className="truncate font-arma-display text-2xl font-semibold uppercase tracking-wide sm:text-3xl">
                 {item.name.replace(/^ARMA\s+/i, "")}

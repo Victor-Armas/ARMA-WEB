@@ -43,7 +43,10 @@ export function FeaturedEditor({
             <h2 className="font-arma-heading text-2xl">La primera impresión</h2>
             <p className="mt-3 max-w-sm text-sm leading-6 text-arma-muted">
               Elige las palabras y los cuatro modelos que reciben a tus
-              clientes.
+              clientes. Fotos recomendadas: 1200 × 1500 px (proporción 4:5), JPG
+              o WebP. Para fondos transparentes, PNG o WebP. Mantén la prenda
+              centrada y deja margen; evita texto pegado a los bordes. Estas
+              fotos se eligen de Gestión de productos.
             </p>
             <label className="mt-5 flex min-h-11 items-center gap-3 text-sm font-medium">
               <input
