@@ -1,3 +1,4 @@
+import { normalizeSku } from "../utils/normalize-sku";
 import { z } from "zod";
 export type CatalogKind = "product" | "material";
 export const catalogVariantSchema = z.object({
@@ -72,7 +73,11 @@ export const catalogFormSchema = z.object({
     .array(
       z.object({
         id: z.uuid(),
-        sku: z.string().trim().min(2, "Escribe el SKU.").max(80),
+        sku: z
+          .string()
+          .trim()
+          .transform(normalizeSku)
+          .pipe(z.string().min(2, "Escribe el SKU.").max(80)),
         size: z.string().trim().max(20),
         color: z.string().trim().max(80),
         description: z.string().trim().max(1000),
@@ -115,7 +120,7 @@ export function catalogDefaults(item?: CatalogItem): CatalogForm {
     variants: item
       ? item.variants.map((variant) => ({
           id: variant.id,
-          sku: variant.sku,
+          sku: normalizeSku(variant.sku),
           size: variant.size ?? "",
           color: variant.color ?? "",
           description: variant.description ?? "",

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { normalizeSku } from "../utils/normalize-sku";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Modal } from "@/components/ui/Modal";
@@ -174,7 +175,27 @@ export function CatalogFormModal({
                     id={`variant-sku-${index}`}
                     maxLength={80}
                     className={fieldClass}
+                    autoCapitalize="characters"
+                    autoCorrect="off"
+                    spellCheck={false}
                     {...form.register(`variants.${index}.sku`)}
+                    onChange={(event) => {
+                      const input = event.currentTarget;
+                      const raw = input.value;
+                      const start = input.selectionStart;
+                      const end = input.selectionEnd;
+                      input.value = normalizeSku(raw);
+                      form.setValue(`variants.${index}.sku`, input.value, {
+                        shouldDirty: true,
+                        shouldValidate: form.formState.isSubmitted,
+                      });
+                      if (start !== null && end !== null) {
+                        input.setSelectionRange(
+                          normalizeSku(raw.slice(0, start)).length,
+                          normalizeSku(raw.slice(0, end)).length,
+                        );
+                      }
+                    }}
                   />
                 </div>
                 <div>
