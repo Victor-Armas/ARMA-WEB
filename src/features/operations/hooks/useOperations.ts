@@ -1,4 +1,5 @@
 import { writeSeller } from "@/features/sellers/services/seller.service";
+import { editReservation } from "@/features/commerce/services/reservation-edit.service";
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
@@ -60,7 +61,13 @@ export function useWorkshopHistory(
 }
 // A network failure keeps exactly the same operation and identifier for a safe retry.
 export function useOperation(
-  action: WorkshopAction | "payment" | "return" | "cost" | "consignment",
+  action:
+    | WorkshopAction
+    | "payment"
+    | "return"
+    | "cost"
+    | "consignment"
+    | "reservation-edit",
   message: string,
 ) {
   const client = useQueryClient();
@@ -72,13 +79,15 @@ export function useOperation(
     mutationKey: ["commerce-write"],
     retry: false,
     mutationFn: (payload: OperationPayload) =>
-      action === "consignment"
-        ? writeSeller(payload)
-        : action === "cost"
-          ? saveMaterialCost(payload)
-          : action === "payment" || action === "return"
-            ? adjustCommerce(action, payload)
-            : writeWorkshop(action, payload),
+      action === "reservation-edit"
+        ? editReservation(payload)
+        : action === "consignment"
+          ? writeSeller(payload)
+          : action === "cost"
+            ? saveMaterialCost(payload)
+            : action === "payment" || action === "return"
+              ? adjustCommerce(action, payload)
+              : writeWorkshop(action, payload),
   });
   async function execute(payload: OperationPayload): Promise<boolean> {
     if (running.current) return false;
@@ -121,6 +130,7 @@ export function useOperation(
           "commerce-orders",
           "commerce-history",
           "reservation-calendar",
+          "reservation-stock",
           "business-dashboard",
         ].map((key) => client.invalidateQueries({ queryKey: [key] })),
       );

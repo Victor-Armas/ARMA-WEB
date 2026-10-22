@@ -46,6 +46,7 @@ export function ReservationsPage() {
   const [status, setStatus] = useState<ReservationStatus>("pending");
   const [seller, setSeller] = useState("");
   const [detailId, setDetailId] = useState<string | null>(null);
+  const [editBusy, setEditBusy] = useState(false);
   const access = useAppAccess();
   const userId = useAuthStore((state) => state.session?.user.id);
   const debounced = useDebouncedValue(search.trim());
@@ -388,10 +389,11 @@ export function ReservationsPage() {
         <Modal
           title={`Detalle del apartado #${String(detail.order_number).padStart(4, "0")}`}
           onClose={() => setDetailId(null)}
-          busy={saving}
+          busy={saving || editBusy}
           wide
         >
           <ReservationRecord
+            onBusyChange={setEditBusy}
             order={detail}
             canWrite={
               access.can("commerce.manage_all") || detail.created_by === userId

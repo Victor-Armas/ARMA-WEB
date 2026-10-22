@@ -1,4 +1,6 @@
 import { ReservationStockAssignment } from "./ReservationStockAssignment";
+import { useEffect, useState } from "react";
+import { ReservationEditor } from "./ReservationEditor";
 import { CustomerWhatsAppLink } from "./CustomerWhatsAppLink";
 import { CommerceHistory } from "./CommerceHistory";
 import { useAppAccess } from "@/features/access/hooks/useAppAccess";
@@ -11,6 +13,7 @@ import {
   formatCalendarDate,
   paymentLabels,
   todayInMonterrey,
+  secondaryButton,
 } from "../utils/commerce-format";
 import { ReservationAction } from "./ReservationAction";
 import { OrderLineItems } from "./OrderLineItems";
@@ -27,12 +30,20 @@ export function ReservationRecord({
   order,
   canWrite,
   embedded = false,
+  onBusyChange,
 }: {
   order: CommerceOrder;
   canWrite: boolean;
   embedded?: boolean;
+  onBusyChange?: (busy: boolean) => void;
 }) {
   const access = useAppAccess();
+  const [editing, setEditing] = useState(false);
+  const [editBusy, setEditBusy] = useState(false);
+  useEffect(() => {
+    onBusyChange?.(editBusy);
+    return () => onBusyChange?.(false);
+  }, [editBusy, onBusyChange]);
   const today = todayInMonterrey();
   const pendingDelivery =
     (order.status === "active" || order.status === "fulfilled") &&
@@ -81,105 +92,127 @@ export function ReservationRecord({
       <div className="mt-2">
         <OrderLineItems items={order.items} />
       </div>
-      <div className="border-y border-arma-border py-4">
-        <p className="flex items-center gap-2 text-xs font-medium text-arma-muted">
-          <CalendarDays size={17} aria-hidden="true" />
-          Compromiso de entrega
-        </p>
-        <p
-          className={`mt-2 text-base font-semibold ${deliveryLate ? "text-arma-red" : ""}`}
-        >
-          {order.delivery_date
-            ? formatCalendarDate(order.delivery_date)
-            : "Sin fecha programada"}
-        </p>
-        {pendingDelivery &&
-        canWrite &&
-        access.can("reservations.edit_delivery") ? (
-          <DeliveryDateEditor id={order.id} date={order.delivery_date} />
-        ) : null}
-      </div>
-      <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-3 tabular-nums">
-        <div>
-          <dt className="text-xs text-arma-muted">Total</dt>
-          <dd className="mt-1 text-lg font-semibold">
-            {formatMoney(order.total)}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-xs text-arma-muted">Abonos acumulados</dt>
-          <dd className="mt-1 font-medium">{formatMoney(order.deposit)}</dd>
-        </div>
-        <div>
-          <dt className="text-xs text-arma-muted">
-            {order.status === "cancelled"
-              ? "Devuelto"
-              : order.status === "fulfilled"
-                ? "Saldo cobrado"
-                : "Saldo pendiente"}
-          </dt>
-          <dd className="mt-1 font-medium">
-            {formatMoney(
-              order.status === "cancelled"
-                ? order.refunded_amount
-                : order.total - order.deposit,
-            )}
-          </dd>
-        </div>
-      </dl>
-      {order.payment_method ? (
-        <p className="mt-3 text-xs text-arma-muted">
-          Primer medio registrado: {paymentLabels[order.payment_method]}
-        </p>
-      ) : null}
-      {order.due_date ? (
-        <p
-          className={`mt-2 text-xs ${paymentLate ? "text-arma-red" : "text-arma-muted"}`}
-        >
-          Fecha límite de pago: {formatCalendarDate(order.due_date)}
-          {paymentLate ? " · Pendiente de revisión" : ""}
-        </p>
-      ) : null}
-      {order.notes ? (
-        <p className="mt-3 whitespace-pre-wrap break-words text-sm text-arma-muted">
-          {order.notes}
-        </p>
-      ) : null}
-      {order.sale_id && access.can("sales.read") ? (
-        <Link
-          to="/sales"
-          className="mt-3 inline-block text-sm text-arma-active underline underline-offset-4"
-        >
-          Consultar venta
-        </Link>
-      ) : null}
-      {order.delivered_at ? (
-        <p className="mt-3 text-sm font-medium text-arma-green">
-          Entrega confirmada el {formatDate(order.delivered_at)}
-        </p>
-      ) : order.status === "fulfilled" &&
-        canWrite &&
-        access.can("reservations.deliver") ? (
-        <DeliveryConfirmation id={order.id} />
-      ) : null}
       {order.status === "active" &&
+      !order.delivered_at &&
       canWrite &&
-      (access.can("sales.complete") || access.can("reservations.cancel")) ? (
-        <ReservationAction
-          order={order}
-          canComplete={
-            order.stock_status !== "waiting" && access.can("sales.complete")
-          }
-          canCancel={access.can("reservations.cancel")}
-        />
+      access.can("reservations.edit") ? (
+        editing ? (
+          <ReservationEditor
+            id={order.id}
+            onClose={() => setEditing(false)}
+            onBusyChange={setEditBusy}
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className={`${secondaryButton} mb-4`}
+          >
+            Editar apartado
+          </button>
+        )
       ) : null}
-      {order.status === "active" && order.stock_status === "waiting" ? (
-        <ReservationStockAssignment
-          order={order}
-          canAssign={canWrite && access.can("reservations.create")}
-        />
-      ) : null}
-      <CommerceHistory order={order} />
+      <fieldset disabled={editBusy} className="min-w-0">
+        <div className="border-y border-arma-border py-4">
+          <p className="flex items-center gap-2 text-xs font-medium text-arma-muted">
+            <CalendarDays size={17} aria-hidden="true" />
+            Compromiso de entrega
+          </p>
+          <p
+            className={`mt-2 text-base font-semibold ${deliveryLate ? "text-arma-red" : ""}`}
+          >
+            {order.delivery_date
+              ? formatCalendarDate(order.delivery_date)
+              : "Sin fecha programada"}
+          </p>
+          {pendingDelivery &&
+          canWrite &&
+          access.can("reservations.edit_delivery") ? (
+            <DeliveryDateEditor id={order.id} date={order.delivery_date} />
+          ) : null}
+        </div>
+        <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-3 tabular-nums">
+          <div>
+            <dt className="text-xs text-arma-muted">Total</dt>
+            <dd className="mt-1 text-lg font-semibold">
+              {formatMoney(order.total)}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs text-arma-muted">Abonos acumulados</dt>
+            <dd className="mt-1 font-medium">{formatMoney(order.deposit)}</dd>
+          </div>
+          <div>
+            <dt className="text-xs text-arma-muted">
+              {order.status === "cancelled"
+                ? "Devuelto"
+                : order.status === "fulfilled"
+                  ? "Saldo cobrado"
+                  : "Saldo pendiente"}
+            </dt>
+            <dd className="mt-1 font-medium">
+              {formatMoney(
+                order.status === "cancelled"
+                  ? order.refunded_amount
+                  : order.total - order.deposit,
+              )}
+            </dd>
+          </div>
+        </dl>
+        {order.payment_method ? (
+          <p className="mt-3 text-xs text-arma-muted">
+            Primer medio registrado: {paymentLabels[order.payment_method]}
+          </p>
+        ) : null}
+        {order.due_date ? (
+          <p
+            className={`mt-2 text-xs ${paymentLate ? "text-arma-red" : "text-arma-muted"}`}
+          >
+            Fecha límite de pago: {formatCalendarDate(order.due_date)}
+            {paymentLate ? " · Pendiente de revisión" : ""}
+          </p>
+        ) : null}
+        {order.notes ? (
+          <p className="mt-3 whitespace-pre-wrap break-words text-sm text-arma-muted">
+            {order.notes}
+          </p>
+        ) : null}
+        {order.sale_id && access.can("sales.read") ? (
+          <Link
+            to="/sales"
+            className="mt-3 inline-block text-sm text-arma-active underline underline-offset-4"
+          >
+            Consultar venta
+          </Link>
+        ) : null}
+        {order.delivered_at ? (
+          <p className="mt-3 text-sm font-medium text-arma-green">
+            Entrega confirmada el {formatDate(order.delivered_at)}
+          </p>
+        ) : order.status === "fulfilled" &&
+          canWrite &&
+          access.can("reservations.deliver") ? (
+          <DeliveryConfirmation id={order.id} />
+        ) : null}
+        {order.status === "active" &&
+        canWrite &&
+        (access.can("sales.complete") || access.can("reservations.cancel")) ? (
+          <ReservationAction
+            order={order}
+            canComplete={
+              order.stock_status !== "waiting" && access.can("sales.complete")
+            }
+            canCancel={access.can("reservations.cancel")}
+          />
+        ) : null}
+        {order.status === "active" && order.stock_status === "waiting" ? (
+          <ReservationStockAssignment
+            order={order}
+            canAssign={canWrite && access.can("reservations.create")}
+          />
+        ) : null}
+        <CommerceHistory order={order} />
+      </fieldset>
     </article>
   );
 }
