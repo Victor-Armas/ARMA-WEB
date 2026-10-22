@@ -63,7 +63,7 @@ export function MaterialEntriesContent({
         <>
           <p className="mb-5 text-sm leading-6 text-arma-muted">
             {view === "receive"
-              ? "Agrega piezas a un insumo que ya existe. Selecciona su variante, la cantidad recibida y el costo de esta compra. Para registrar un insumo nuevo, utiliza Crear insumo."
+              ? "Agrega piezas a un insumo que ya existe. Selecciona su variante y la cantidad recibida. El costo se precarga con la referencia registrada; revísalo si esta compra tuvo otro precio. Para registrar un insumo nuevo, utiliza Crear insumo."
               : "Corrige el costo por pieza de las existencias actuales. Este ajuste no agrega ni retira piezas y queda registrado con su motivo."}
           </p>
           <ReceiptForm

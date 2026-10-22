@@ -67,6 +67,13 @@ export function ReceiptForm({
           onChange={(v) => {
             setVariant(v);
             form.setValue("variant_id", v.id, { shouldValidate: true });
+            if (!valuation) {
+              const cost = v.estimated_cost ?? v.cost;
+              form.setValue("unit_cost", cost === null ? "" : cost.toFixed(2), {
+                shouldValidate: true,
+                shouldDirty: false,
+              });
+            }
           }}
         />
         {errors.variant_id ? (
@@ -108,6 +115,15 @@ export function ReceiptForm({
             )}
           </FormField>
         </div>
+        {!valuation && variant ? (
+          <p className="text-sm leading-6 text-arma-muted">
+            {variant.estimated_cost !== null
+              ? "Costo precargado desde la referencia del insumo. Puedes modificarlo si esta compra tuvo otro precio."
+              : variant.cost !== null
+                ? "Costo precargado desde el promedio de inventario. Puedes modificarlo si esta compra tuvo otro precio."
+                : "Este insumo aún no tiene un costo registrado. Captura el costo por pieza de esta compra."}
+          </p>
+        ) : null}
         {valuation ? (
           <FormField
             label="Motivo de la valoración"

@@ -79,6 +79,8 @@ Las dimensiones se sincronizan con la variante del insumo: editar sus medidas ac
 
 El costo de referencia se usa para cotizar recetas. El costo promedio de inventario permanece separado y solo se cambia al recibir material o confirmar explícitamente la valoración de existencias. El formulario de costos permite confirmar dicha valoración si la cuenta tiene materials.receive. Cada cambio de referencia y cada valoración queda registrado, sin reescribir costos de órdenes ni ventas anteriores.
 
+Al seleccionar una variante en Registrar entrada, el costo por pieza se precarga desde `estimated_cost` (la misma referencia del catálogo, incluido el DTF calculado por dimensiones y tarifa). Si no hay referencia, utiliza `cost`, el promedio de inventario; si ambos son nulos, solicita captura manual. El importe se redondea a dos decimales, admite cero y puede editarse para reflejar el precio de esa compra. Cambiar de variante sustituye el costo anterior, incluso si la nueva variante no tiene costo. Ajustar costo actual conserva la captura explícita. Cada entrada sigue guardando su costo histórico y actualizando el promedio ponderado mediante `workshop_write`; no modifica el perfil de referencia ni costos anteriores.
+
 ## Recetas y tablero de armado
 
 Recetas tiene su propia ruta /recipes, con filtros para configuradas y pendientes. Cada receta contiene una playera sin imprimir, uno o varios DTF, mano de obra, luz, cinta/consumibles, otros gastos por playera y margen objetivo. El editor muestra fotografías y un desglose del costo de referencia. Inicio distingue Precio medio de venta (promedio cobrado) de Costo de producción y Precio sugerido.
